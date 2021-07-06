@@ -1,0 +1,318 @@
+{
+    "repositoryDefinition": {
+        "type": "object",
+        "additionalProperties": false,
+        "manualrepositoryDiscovery" : true,
+        "properties": {
+            "name": {
+                "type": "string",
+                "prettyName": "Name",
+                "description": "Displayable Name for the MariaDB Binary"
+            },
+            "version": {
+                "type": "string",
+                "prettyName": "Version",
+                "description": "The version of the MariaDB DB binaries"
+             },
+            "installPath": { 
+                "type": "string",
+                "prettyName": "Location",
+                "description": "This is the path to MariaDB executables"
+            }
+        },
+        "nameField": "name",
+        "identityFields": ["installPath"]
+    },
+    "sourceConfigDefinition": {
+        "type": "object",
+        "ordering": ["dataDir","port","baseDir","dbName"],
+        "required": ["dataDir","port","baseDir","dbName"],
+        "additionalProperties": false,
+        "properties": {
+            "dataDir": {
+                "type": "string",
+                "prettyName": "Data Directory",
+                "description": "Full path of the MariaDB DB data directory (include the data directory)"
+              },
+             "port": {
+                "type": "string",
+                "prettyName": "Port",
+                "description": "Port for the MariaDB database"
+             }, 
+             "baseDir": {
+                "type": "string",
+                "prettyName": "Base Directory",
+                "description": "Path of the MariaDB Installation, where binaries (/bin) is located "
+             },
+             "dbName": {
+                "type": "string",
+                "prettyName": "MariaDB Instance Name",
+                "description": "Name of the MariaDB Instance."
+             }
+        },
+        "nameField": "dbName",
+        "identityFields": ["dataDir","port"]
+    },
+    "virtualSourceDefinition": {
+        "type": "object",
+        "additionalProperties" : false,
+        "ordering": [
+           "vdbUser",
+           "vdbPass",
+           "baseDir",
+           "port",
+           "serverId",
+           "mPath",
+           "config_settings_prov"
+         ],
+        "required": [
+           "vdbUser",
+           "vdbPass",
+           "baseDir",
+           "port",
+           "serverId",
+           "mPath"
+         ],
+        "properties" : {
+         "vdbHost": {
+            "type": "string",
+            "prettyName": "HostName or IP",
+            "description": "HostName or IP Address of Target Host for VDBs",
+            "default": "localhost"
+         },
+         "vdbUser": {
+            "type": "string",
+            "prettyName": "DB User",
+            "description": "DB user for the virtual database",
+            "default": "delphixdb"
+         },         
+         "vdbPass": {
+            "type": "string",
+            "format": "password",
+            "prettyName": "DB Password",
+            "description": "DB user password for the virtual database",
+            "default": "delphixdb"
+         },
+         "baseDir": {
+            "type": "string",
+            "prettyName": "BaseDir",
+            "description": "Path of the MariaDB Installation, where binaries (./bin) exists",
+            "default": "/usr"
+         },
+         "port": {
+            "type": "string",
+            "prettyName": "VDB Port",
+            "description": "Port for the MariaDB VDB",
+            "default": "3308"
+         },
+         "serverId": {
+            "type": "string",
+            "prettyName": "VDB Server ID",
+            "description": "Server ID for the MariaDB VDB",
+            "default": "201"
+         },
+         "config_settings_prov" : {
+            "type" : "array",
+            "prettyName" : "my.cnf Config Settings",
+            "description" : "Custom Database-Level config settings",
+            "items": {
+               "type": "object",
+               "required": ["propertyName","value"],
+               "ordering": ["propertyName", "value"],
+               "properties": {
+                  "propertyName" : {
+                     "type" : "string",
+                     "prettyName": "Property Name",
+                     "pattern": "^$|^[_a-zA-Z0-9]*$",
+                     "default": "",
+                     "maxLength": 40
+                  },
+                  "value": {
+                     "type": "string",
+                     "prettyName": "Value",
+                     "pattern": "^$|^[_a-zA-Z0-9]*$",
+                     "default": "",
+                     "maxLength": 40
+                  }
+               }
+            }
+         },
+         "mPath": {
+            "type": "string",
+            "prettyName": "Mount Location",
+            "description": "Unique NFS Mount folder for Delphix",
+            "default": "/mnt/provision/MariaDB_vdb"
+         }
+      }
+    },
+    "linkedSourceDefinition": {
+        "type": "object",
+        "additionalProperties" : false,
+        "required": [
+          "dSourceType",
+          "serverId",
+          "stagingPort",
+          "mountPath"
+        ],
+        "ordering" : [
+          "dSourceType",
+          "stagingPass",
+          "stagingBasedir",
+          "serverId",
+          "stagingPort",
+          "mountPath",
+          "sourceip",          
+          "backupPath",
+          "sourceUser",
+          "sourcePass",
+          "logSync",
+          "replicationUser",
+          "replicationPass"
+        ],
+        "properties" : {
+          "dSourceType": {
+            "type": "string",
+            "prettyName": "dSource Type",
+            "description": "",
+            "enum": ["Manual Backup Ingestion", "Replication"],
+            "default": "Replication"
+          },
+          "backupPath": {
+             "type": "string",
+             "prettyName": "Full path (including filename) to MariaDB backup.",
+             "description": "* Leave blank if Delphix is taking backups",
+             "default": ""
+          },
+         "sourceip": {
+            "type": "string",
+            "prettyName": "Source DB Host IP address",
+            "description": "* Required if using Replication Method",
+            "default": "10.0.1.20"
+         },
+          "mountPath": {
+            "type": "string",
+            "prettyName": "Mount Location on Staging Host",
+            "description": "Unique NFS mount directory on the Staging Host",
+            "default": "/mnt/provision/MariaDB_stage"
+         },
+         "sourceUser": {
+             "type": "string",
+             "prettyName": "Source DB UserName",
+             "description": "* Required if Delphix is taking backups",
+             "default": "delphixdb"
+          },
+          "sourcePass": {
+             "type": "string",
+             "format": "password",
+             "prettyName": "Source Connection Password",
+             "description": "* Required if Delphix is taking backups",
+             "default": "delphixdb"
+          },
+          "logSync": {
+             "default": true,
+             "prettyName": "LogSync",
+             "type": "boolean",
+             "description": "LogSync needs to be enabled if using Replication Method."
+          },
+          "replicationUser": {
+             "type": "string",
+             "prettyName": "Replication UserName",
+             "description": "* Required if using Replication Method with LogSync",
+             "default": "delphixdb"
+          },
+          "replicationPass": {
+             "type": "string",
+             "format": "password",
+             "prettyName": "Replication User's Password",
+             "description": "* Required if using Replication Method with LogSync",
+             "default": "delphixdb"
+          },
+          "stagingPass": {
+             "type": "string",
+             "format": "password",
+             "prettyName": "Staging Initialization Password",
+             "description": "root user password to use while initializing Staging DB.",
+             "default": "delphixdb"
+          },
+          "serverId": {
+             "type": "string",
+             "prettyName": "Staging DB Server ID",
+             "description": "ServerID for the Stagine DB. Must be different from Source DB Server ID",
+             "default": "102"
+          },
+          "stagingPort": {
+             "type": "string",
+             "prettyName": "Staging DB Port",
+             "description": "Staging Database Port",
+             "default": "3308"
+          },
+          "stagingBasedir": {
+             "type": "string",
+             "prettyName": "MariaDB Base Directory",
+             "description": "Base Directory of MariaDB Installation (Location of /bin/MariaDB)",
+             "default": "/usr"
+          }
+        }
+      },
+    "snapshotDefinition": {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+         "snapshotId": {
+            "type": "string",
+            "prettyName": "Snapshot ID",
+            "description": "A unique ID for this snapshot"
+         },
+         "snapPort": {
+            "type": "string",
+            "prettyName": "Snapshot Port",
+            "description": ""
+         },
+         "snapDataDir": {
+            "type": "string",
+            "prettyName": "Snapshot --datadir",
+            "description": ""
+         },
+         "snapBaseDir": {
+            "type": "string",
+            "prettyName": "Snapshot --basedir",
+            "description": ""
+         },
+         "snapConn": {
+            "type": "string",
+            "prettyName": "Snapshot Connection String",
+            "description": ""
+         },
+         "snapPass": {
+            "type": "string",
+            "format": "password",
+            "prettyName": "Snapshot Connection Password",
+            "description": ""
+         },
+         "snapBackupPath": {
+            "type": "string",
+            "prettyName": "Snapshot Backup Path",
+            "description": ""
+         },
+         "snapTime": {
+            "type": "string",
+            "prettyName": "Snapshot Timestamp",
+            "description": "Time when the snapshot was taken."
+         }
+      }
+    },
+    "snapshotParametersDefinition": {
+        "type": "object",
+        "required": ["resync"],
+        "additionalProperties": false,
+        "properties": {
+            "resync": {
+                "type": "boolean",
+                "prettyName": "Resynchronize dsource",
+                "description": "Resynchronize the dsource will create / recreate it using full backup",
+                "default": true
+            }
+        },
+        "type": "object"
+    }
+}
