@@ -1,0 +1,12 @@
+id: 62b26730-08c6-4f0e-bdcc-2a2bd77f1039
+name: Mariadb-sdk-plugin
+language: PYTHON27
+hostTypes:
+- UNIX
+pluginType: STAGED
+entryPoint: plugin_runner:plugin
+srcDir: src
+rootSquashEnabled: false
+schemaFile: schema.json
+buildNumber: 0.1.1
+
