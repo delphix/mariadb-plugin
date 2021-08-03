@@ -1,2 +1,2 @@
-# msyql_sdk_plugin
-MySQL SDK Plugin for Delphix
+# MariaDB SDK Plugin
+MariaDB SDK Plugin for Delphix
