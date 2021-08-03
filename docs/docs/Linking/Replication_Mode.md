@@ -4,14 +4,14 @@ In Replication Mode, Delphix creates a staging database using an initial backup 
 This initial backup can be taken by Delphix or can be provided by the end user. 
 
 In order to ensure that the staging database remains in-sync with the source database, 
-Delphix can set up a MySQL native replication. from the source db to the staging db.
+Delphix can set up a MariaDB native replication. from the source db to the staging db.
 
 ### Pre-Requisites
     
 - Staging environment must be added to Delphix.
-- A Source Config must be created on the staging environment-MySQL repository.
+- A Source Config must be created on the staging environment-MariaDB repository.
 - <span class="code_title">[Recommended] </span>
-    As every  organization's MySQL configuration is different,
+    As every  organization's MariaDB configuration is different,
     Delphix expects a starter *my.cnf* file to be present in Delphix Toolkit Directory when creating a staging database.
     Delphix will use this *my.cnf* file and modify it as per the configuration provided during the the dsource creation process.
 
@@ -30,7 +30,7 @@ Delphix can set up a MySQL native replication. from the source db to the staging
      ![Screenshot](../image/add-dsource.png)
    
    
-4. In the Add dSource wizard, select the MySQL source configuration which is created on the staging host.
+4. In the Add dSource wizard, select the MariaDB source configuration which is created on the staging host.
 5. Select *Replication* in the dSource Type dropdown.
      
       ![Screenshot](../image/dsource-type.png)   
@@ -50,9 +50,9 @@ Delphix can set up a MySQL native replication. from the source db to the staging
         Password to use while initializing the dsource (staging db). 
         This password will be assigned to the *'root'@'localhost'*
       
-    - MySQL Base Directory
+    - MariaDB Base Directory
       
-        MySQL installation directory. This is where the location of */bin/mysql*
+        MariaDB installation directory. This is where the location of */bin/mysql*
       
     - Mount Location on Staging Host
 
@@ -75,10 +75,10 @@ Delphix can set up a MySQL native replication. from the source db to the staging
     
      - Databases List
   
-        Comma separated list of databases on the source MySQL instance that should be part of the dSource.
+        Comma separated list of databases on the source MariaDB instance that should be part of the dSource.
         Default value *ALL* indicates that all databases on the source instance will be brought in.
        
-     - MySQL Backup Path 
+     - MariaDB Backup Path 
         
         Full path, including the filename, of the full source db backup to use for the dsource creation.
         If this is provided, Delphix will not create a backup. 
@@ -111,5 +111,5 @@ Once the dSource creation is successful, the <span class="code_title">*Timeflow*
 
 Done, What's Next?
 ----------------
-Alright, we have created a MySQL dSource. Next step - Provision a VDB.   
+Alright, we have created a MariaDB dSource. Next step - Provision a VDB.   
 

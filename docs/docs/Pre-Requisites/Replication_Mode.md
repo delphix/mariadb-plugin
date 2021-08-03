@@ -1,10 +1,10 @@
 # Replication
 
-Given below are the pre-requisites for MySQL virtualization when using Replication mode.
+Given below are the pre-requisites for MariaDB virtualization when using Replication mode.
 
 ### Source Environment Requirements
     
- Source environment is where the source MySQL databases are running. 
+ Source environment is where the source MariaDB databases are running. 
 
 #### Connectivity
  - Delphix staging user must be able to connect to source environment from staging and take a backup of the source database(s) using the *mysqldump* utility.
@@ -88,18 +88,18 @@ Please refer to Delphix Docs for more detailed requirements.
         </div>
     </div>
   
- - Delphix OS user should be in the same primary and secondary groups as mysql user ( or the MySQL binary owner )
- - Delphix OS user must have execute access on all files within MySQL installation folder - Min permission level 775 recommended.
+ - Delphix OS user should be in the same primary and secondary groups as mysql user ( or the MariaDB binary owner )
+ - Delphix OS user must have execute access on all files within MariaDB installation folder - Min permission level 775 recommended.
 
 #### Storage
  - Staging Host must have enough storage space to hold the source backup file. 
  - Empty folder on staging host to hold delphix toolkit [ approximate 2GB free space ]
 
-#### MySQL Version & Configuration
-- MySQL Binary version must match the version on the source database(s)
+#### MariaDB Version & Configuration
+- MariaDB Binary version must match the version on the source database(s)
   
 - <span class="code_title">[Recommended] </span>
-  As every  organization's MySQL configuration is different, 
+  As every  organization's MariaDB configuration is different, 
   Delphix expects a starter *my.cnf* file to be present in Delphix Toolkit Directory when creating a staging database.
   Delphix will use this *my.cnf* file and modify it as per the configuration provided during the the dsource creation process. 
   
@@ -131,8 +131,8 @@ Please refer to Delphix Docs for more detailed requirements.
         </div>
     </div>
 
-- Delphix OS user should be in the same primary and secondary groups as mysql user ( or the MySQL binary owner )
-- Delphix OS user must have execute access on all files within MySQL installation folder - Min permission level 775 recommended.
+- Delphix OS user should be in the same primary and secondary groups as mysql user ( or the MariaDB binary owner )
+- Delphix OS user must have execute access on all files within MariaDB installation folder - Min permission level 775 recommended.
 
 
 Done, What's Next?

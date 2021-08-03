@@ -7,7 +7,7 @@ A VDB can be created using a snapshot on the dSource timeflow.
 
 - Require a linked dSource with at least 1 snapshot.
 - Require a Target environment added to Delphix.
-- A MySQL binary with the same version as the source db must be installed on the Target enviornment.
+- A MariaDB binary with the same version as the source db must be installed on the Target enviornment.
   
     !!! warning
         It may take upto 5 minutes after successful dSource creation for the status to show as Active.
@@ -22,7 +22,7 @@ A VDB can be created using a snapshot on the dSource timeflow.
       ![Screenshot](./image/select-snap.png)
 
 2. Select the target host from the dropdown on which VDB needs to be created.  
-   If there are multiple MySQL repositories on the host, 
+   If there are multiple MariaDB repositories on the host, 
    select the one that matches the source db version.
    
     If there are multiple OS users on the host, select the user you want to use. 
@@ -38,13 +38,13 @@ A VDB can be created using a snapshot on the dSource timeflow.
          Password for the VDB db user. 
    
       - BaseDir
-         MySQL installation directory. This is where the location of */bin/mysql*
+         MariaDB installation directory. This is where the location of */bin/mysql*
    
       - VDB Port
-         MySQL database port for the VDB.
+         MariaDB database port for the VDB.
    
       - VDB Server ID
-         MySQL server id for the VDB. This server id must be non-zero and greater than the dsource server id.
+         MariaDB server id for the VDB. This server id must be non-zero and greater than the dsource server id.
         
       - Mount Location
          This is the mount directory for Delphix VDB on the Target host.
@@ -67,4 +67,4 @@ A VDB can be created using a snapshot on the dSource timeflow.
 
 And we're done!
 ----------------
-We have now successfully provisioned a MySQL VDB. 
+We have now successfully provisioned a MariaDB VDB. 

@@ -8,9 +8,9 @@ or via a SnapSync policy once the data is restored into the seed staging databas
 ### Pre-Requisites
 
 - Staging environment must be added to Delphix.
-- A Source Config must be created on the staging environment-MySQL repository.
+- A Source Config must be created on the staging environment-MariaDB repository.
 - <span class="code_title">[Recommended] </span>
-  As every  organization's MySQL configuration is different,
+  As every  organization's MariaDB configuration is different,
   Delphix expects a starter *my.cnf* file to be present in Delphix Toolkit Directory when creating a staging database.
   Delphix will use this *my.cnf* file and modify it as per the configuration provided during the the dsource creation process.
 
@@ -29,7 +29,7 @@ or via a SnapSync policy once the data is restored into the seed staging databas
    ![Screenshot](../image/add-dsource.png)
 
 
-4. In the Add dSource wizard, select the MySQL source configuration which is created on the staging host.
+4. In the Add dSource wizard, select the MariaDB source configuration which is created on the staging host.
 5. Select *Manual Ingestion* in the dSource Type dropdown.
 6. Provide the additional details required for dsource creation
   - Staging DB Server ID
@@ -46,9 +46,9 @@ or via a SnapSync policy once the data is restored into the seed staging databas
     Password to use while initializing the dsource (staging db).
     This password will be assigned to the *'root'@'localhost'*
 
-  - MySQL Base Directory
+  - MariaDB Base Directory
 
-    MySQL installation directory. This is where the location of */bin/mysql*
+    MariaDB installation directory. This is where the location of */bin/mysql*
 
   - Mount Location on Staging Host
 
@@ -78,5 +78,5 @@ Once the dSource creation is successful, the <span class="code_title">*Timeflow*
 
 Done, What's Next?
 ----------------
-Alright, we have created a MySQL dSource. Next step - Provision a VDB.   
+Alright, we have created a MariaDB dSource. Next step - Provision a VDB.   
 

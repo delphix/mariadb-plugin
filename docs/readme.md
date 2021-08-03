@@ -1,4 +1,4 @@
-# MySQLLinux
+# MariaDBLinux
 
 This is the Markdown-based documentation for mysqllinux repository.
 

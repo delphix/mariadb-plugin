@@ -5,9 +5,9 @@
 
 
 -   Delphix Engine of version 6.0.x
--   Install MySQL Binaries on source, staging, and target servers
+-   Install MariaDB Binaries on source, staging, and target servers
 
-## Installing the MySQL Plugin
+## Installing the MariaDB Plugin
 
 ### Method1: Using GUI
 

@@ -1,6 +1,6 @@
 # Discovery
 
-Environment discovery/refresh is a process that enables the MySQL Plugin to determine MySQL installation details on a host. 
+Environment discovery/refresh is a process that enables the MariaDB Plugin to determine MariaDB installation details on a host. 
 Database discovery/refresh is initiated during the environment set up process.
 
 Whenever there is any change (installing a new database home) to an already set up environment in the Delphix application, 
@@ -9,7 +9,7 @@ we need to perform an environment discovery/refresh.
 
 ## Prerequisites
 
--   Installation of the MySQL Plugin is required before the Discovery.
+-   Installation of the MariaDB Plugin is required before the Discovery.
 
 ## Refreshing an Environment
 
@@ -24,21 +24,21 @@ Environment refresh will update the metadata associated with that environment an
 
 ![Screenshot](./image/image9.png)
 
-Once an environment refresh completes successfully, Delphix will discover all MySQL installations on the environment. 
+Once an environment refresh completes successfully, Delphix will discover all MariaDB installations on the environment. 
 These installations are referred to as "repositories"
 
 
 ## Add Source Config
 
 
-As noted avove, environments contain `repositories`, that are MySQL installations in the environment. 
+As noted avove, environments contain `repositories`, that are MariaDB installations in the environment. 
 Each environment may have any number of repositories associated with it.  
 
 The next step in the virtualization process is to add a `SourceConfig`. 
 A `SourceConfig` object defines the configuratino of the dSource and is required to create a dSource.
 You can create any number of `SourceConfig` objects using a repository, which represent known database instances. 
 
-For the MySQL plugin, Source config is must be created manually.
+For the MariaDB plugin, Source config is must be created manually.
 
 ### How to create Source Config
 
@@ -55,8 +55,8 @@ For the MySQL plugin, Source config is must be created manually.
       
       - Enter source data directory in section **Data Directory**.
       - Enter source port number in **Port** section.
-      - Enter MySQL base directory on the source host in **Base Directory** section.
-      - Enter dsource name in **MySQL dSource Name** section.
+      - Enter MariaDB base directory on the source host in **Base Directory** section.
+      - Enter dsource name in **MariaDB dSource Name** section.
 
    ![Screenshot](./image/image11.png)
 
