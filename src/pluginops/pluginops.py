@@ -437,6 +437,7 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             output = result.stdout.strip()
             error = result.stderr.strip()
             exit_code = result.exit_code
+            logger.debug(output)
             if exit_code != 0:
                 logger.debug("Error is : "+error)
                 raise LinkingException(
