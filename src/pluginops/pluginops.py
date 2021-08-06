@@ -145,6 +145,8 @@ def find_mysql_binaries(connection):
                 versionStr = _bashresult.stdout.strip()
                 versionArr = versionStr.split(" ")
                 version = versionArr[3]
+                if "-log" in version:
+                    version = version.replace('-log', '')
                 logger.debug("MariaDB discoverd version is : "+version)
                 if (version != "" and baseName == "mysqld"):
                     prettyName = versionStr[versionStr.index(
