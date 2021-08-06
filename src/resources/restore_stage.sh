@@ -14,10 +14,15 @@ PGM_NAME='restore_stage.sh'
 #
 # Load Library ...
 #
+#eval "${DLPX_LIBRARY_SOURCE}"
+#result=`hey`
+#log "------------------------- Start"
+#log "Library Loaded ... hey $result"
+
 eval "${DLPX_LIBRARY_SOURCE}"
-result=`hey`
-log "------------------------- Start"
-log "Library Loaded ... hey $result"
+result=`library_load`
+log "Start ${PGM_NAME}"
+log "Library Load Status: $result"
 
 who=`whoami`
 log "whoami: $who"
@@ -83,8 +88,8 @@ MASTER_PASS="${REPLICATION_PASS}"
 #
 NEW_MOUNT_DIR="${STAGINGDATADIR}"
 log "Staging Base Directory: ${NEW_MOUNT_DIR}" 
-chmod -R 755 ${NEW_MOUNT_DIR}
-chgrp -R mysql ${NEW_MOUNT_DIR}
+sudo chmod -R 755 ${NEW_MOUNT_DIR}
+sudo chgrp -R mysql ${NEW_MOUNT_DIR}
 
 NEW_DATA_DIR="${NEW_MOUNT_DIR}/data"
 NEW_LOG_DIR="${NEW_MOUNT_DIR}/log"
@@ -122,6 +127,7 @@ fi
 log "MariaDB Version: ${MYSQLVER}"
 #10.1.32-MariaDB 
 #echo ${MYSQLVER:0:3}
+#10.1.32-MariaDB 
 
 log "Source --basedir=${SOURCEBASEDIR}"
 log "Source --datadir=${SOURCEDATADIR}"
@@ -137,8 +143,10 @@ log "Creating Initial Database ..."
    log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR}"
    sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
 
+
    TMP_PWD=""
    log "Temporary password: ${PWD_LINE}"
+
 
 #   PWD_LINE=`cat ${NEW_DATA_DIR}/mysqld.log | grep 'temporary password'`
    # sudo grep 'temporary password' ${NEW_DATA_DIR}/mysqld.log`
@@ -174,10 +182,10 @@ mkdir -p ${NEW_TMP_DIR}
 #set privs for mysql group to allow delphix user ops
 sudo chgrp -R mysql ${NEW_DATA_DIR} 
 sudo chmod -R g+rwx ${NEW_DATA_DIR}
-chgrp -R mysql ${NEW_LOG_DIR} 
-chmod -R g+rwx ${NEW_LOG_DIR}
-chgrp -R mysql ${NEW_TMP_DIR} 
-chmod -R g+rwx ${NEW_TMP_DIR}
+sudo chgrp -R mysql ${NEW_LOG_DIR} 
+sudo chmod -R g+rwx ${NEW_LOG_DIR}
+sudo chgrp -R mysql ${NEW_TMP_DIR} 
+sudo chmod -R g+rwx ${NEW_TMP_DIR}
 
 #
 # This snippet creates a config file if one has not been provided.
@@ -195,7 +203,12 @@ else
    log "Since the above file was missing, Creating my.cnf file ..."
    echo "[mysqld]" > ${NEW_MY_CNF}
    echo "server-id               = ${NEW_SERVER_ID}" >> ${NEW_MY_CNF}
-   echo "binlog-format           = mixed" >> ${NEW_MY_CNF}
+   if [ ${MYSQLVER} -gt "10.2.39" ] 
+   then
+      echo "binlog-format           = mixed" >> ${NEW_MY_CNF}
+   else
+      echo "binlog-format           = statement" >> ${NEW_MY_CNF}
+   fi
    echo "log_bin                 = ${NEW_LOG_DIR}/mysql-bin" >> ${NEW_MY_CNF}
    echo "relay-log               = ${NEW_LOG_DIR}/mysql-relay-bin" >> ${NEW_MY_CNF}
    echo "log-slave-updates       = 1" >> ${NEW_MY_CNF}
@@ -246,13 +259,24 @@ then
    echo "Server-Id updated"
 
    echo "Parameter binlog-format = mixed"
-   CHK=`cat ${NEW_MY_CNF} | grep "^binlog-format"`
+   CHK=`cat ${NEW_MY_CNF} | grep "^binlog-format.*mixed"`
    if [[ "${CHK}" != "" ]]
    then
  		   sed -i "/^binlog-format/s;binlog-format;##dlpx##binlog-format;" ${NEW_MY_CNF}
          sed -i "/^##dlpx##binlog-format/s;##dlpx##binlog-format;binlog-format=mixed ##dlpx##;" ${NEW_MY_CNF}
    else
          echo "binlog-format=mixed" >> ${NEW_MY_CNF}
+   fi
+   echo "Bin-Log-Format updated"
+
+   echo "Parameter binlog-format = statement"
+   CHK=`cat ${NEW_MY_CNF} | grep "^binlog-format.*statement"`
+   if [[ "${CHK}" != "" ]]
+   then
+ 		   sed -i "/^binlog-format/s;binlog-format;##dlpx##binlog-format;" ${NEW_MY_CNF}
+         sed -i "/^##dlpx##binlog-format/s;##dlpx##binlog-format;binlog-format=statement ##dlpx##;" ${NEW_MY_CNF}
+   else
+         echo "binlog-format=statement" >> ${NEW_MY_CNF}
    fi
    echo "Bin-Log-Format updated"
 
@@ -624,7 +648,7 @@ then
    # Start Slave ...
    #
    log "Starting Slave ..."
-   RESULTS=$(${INSTALL_BIN}/mysql ${STAGING_CONN} -vvv < ${TMPLOG}.sql)
+   RESULTS=$(${INSTALL_BIN}/mysql ${STAGING_CONN} -vvv < ${TMPLOG}.sql > ${TMPLOG}.out)
    return_code=$?
    log "Return Status for starting slave: ${return_code}"
    if [ $return_code != 0 ]; then

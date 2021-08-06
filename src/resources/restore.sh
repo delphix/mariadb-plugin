@@ -65,7 +65,8 @@ then
    # Source Connection for Backup ...
    #
    masklog "Source Connection: ${SOURCECONN}"
-   RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
+   #RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
+   RESULTS=$( buildConnectionString "${SOURCECONN}" "${REPLICATION_PASS}" "${SOURCEPORT}" "${SOURCEIP}" )
    #log "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"
    SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
    masklog "New Conn: ${SOURCE_CONN}"
@@ -105,10 +106,10 @@ then
 
       return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)
       return_code=$?
-      log "Return Status for change password: ${return_code}"
-      log "Return message for change password:${return_msg}"
+      log "Return Status for db list dump: ${return_code}"
+      log "Return message for db list dump:${return_msg}"
       if [ $return_code != 0 ]; then
-        terminate "${return_msg}" 1
+        terminate "${return_msg}" 8
       fi
    else 
 
@@ -127,7 +128,7 @@ then
          log "Return Status for backup dump : ${return_code}"
          log "Return message for backup dump :${return_msg}"
          if [ $return_code != 0 ]; then
-           terminate "${return_msg}" 2
+           terminate "${return_msg}" 8
          fi
 
       else 
@@ -139,7 +140,7 @@ then
          log "Return Status for backup dump : ${return_code}"
          log "Return message for backup dump :${return_msg}"
          if [ $return_code != 0 ]; then
-           terminate "${return_msg}" 3
+           terminate "${return_msg}" 8
          fi
       fi 
 

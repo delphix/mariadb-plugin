@@ -59,16 +59,7 @@ def source_config_discovery(source_connection, repository):
 
 @plugin.linked.mount_specification()
 def linked_mount_specification(staged_source, repository):
-    logger.debug("linked_mount_specification")
-    try:
-        mount_path = staged_source.parameters.mount_path
-        logger.debug("Mount Path:"+mount_path)
-        environment = staged_source.staged_connection.environment
-        mounts = [Mount(environment, mount_path)]
-    except Exception as err:
-        logger.debug("ERROR: Error creating NFS Mount"+err.message)
-        raise
-    return MountSpecification(mounts)
+    return pluginops.linked_mount_specification(staged_source, repository)
 
 
 @plugin.linked.start_staging()
@@ -203,9 +194,4 @@ def virtual_status(virtual_source, repository, source_config):
 
 @plugin.virtual.mount_specification()
 def virtual_mount_specification(virtual_source, repository):
-    logger.debug("virtual_mount_specification")
-    mount_path = virtual_source.parameters.m_path
-    logger.debug("Mount Path:"+mount_path)
-    environment = virtual_source.connection.environment
-    mounts = [Mount(environment, mount_path)]
-    return MountSpecification(mounts)
+    return pluginops.virtual_mount_specification(virtual_source, repository)

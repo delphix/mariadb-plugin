@@ -42,7 +42,7 @@ from generated.definitions import (
 logger = logging.getLogger(__name__)
 
 ##################################################
-# Manage mount specification options for linked objects
+# Find Repository Information on Host
 # Format: Python
 ##################################################
 
@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 def linked_mount_specification(staged_source, repository):
     logger.debug("linked_mount_specification")
     try:
-        # This code is introduced to handle the force mount option
+
         logger.debug("Check if there is any steal mount.")
         steal_mount = "df -h %s 2>&1 | grep 'Stale file handle' | wc -l" % (
             staged_source.parameters.mount_path)
@@ -58,13 +58,19 @@ def linked_mount_specification(staged_source, repository):
         result = libs.run_bash(
             staged_source.staged_connection, steal_mount, variables=None, check=True)
         output = result.stdout.strip()
-
+        #        error = result.stderr.strip()
+        #        exit_code = result.exit_code
+        #        logger.debug("==================================")
+        #        logger.debug(output)
+        #        logger.debug("==================================")
         if output == "1":
             force_umount = "sudo umount -lf %s" % (
                 staged_source.parameters.mount_path)
             result = libs.run_bash(
                 staged_source.staged_connection, steal_mount, None)
             output = result.stdout.strip()
+#            error = result.stderr.strip()
+#            exit_code = result.exit_code
 
         mount_path = staged_source.parameters.mount_path
         logger.debug("Mount Path:"+mount_path)
@@ -75,16 +81,10 @@ def linked_mount_specification(staged_source, repository):
         raise
     return MountSpecification(mounts)
 
-##################################################
-# Manage mount specification options for virtual objects
-# Format: Python
-##################################################
-
 
 def virtual_mount_specification(virtual_source, repository):
     logger.debug("virtual_mount_specification")
     try:
-        # This code is introduced to handle the force mount option
         logger.debug("Check if there is any steal mount.")
         logger.debug(virtual_source.parameters.m_path)
         steal_mount = "df -h %s 2>&1 | grep 'Stale file handle' | wc -l" % (
@@ -93,14 +93,19 @@ def virtual_mount_specification(virtual_source, repository):
         result = libs.run_bash(
             virtual_source.connection, steal_mount, variables=None, check=True)
         output = result.stdout.strip()
-
+        error = result.stderr.strip()
+        exit_code = result.exit_code
+        logger.debug("==================================")
+        logger.debug(output)
+        logger.debug("==================================")
         if output == "1":
             force_umount = "sudo umount -lf %s" % (
                 virtual_source.parameters.m_path)
             result = libs.run_bash(
                 virtual_source.connection, steal_mount, None)
             output = result.stdout.strip()
-
+            error = result.stderr.strip()
+            exit_code = result.exit_code
         mount_path = virtual_source.parameters.m_path
         logger.debug("Mount Path:"+mount_path)
         environment = virtual_source.connection.environment
@@ -109,11 +114,6 @@ def virtual_mount_specification(virtual_source, repository):
         logger.debug("ERROR: Error creating NFS Mount"+err.message)
         raise
     return MountSpecification(mounts)
-
-##################################################
-# Find Repository Information on Host
-# Format: Python
-##################################################
 
 
 def find_mysql_binaries(connection):
@@ -142,10 +142,13 @@ def find_mysql_binaries(connection):
                 dirName = os.path.dirname(repoPath)
                 _bashresult = runbash(
                     connection, CommandFactory.get_version(repoPath), None)
+
                 versionStr = _bashresult.stdout.strip()
                 versionArr = versionStr.split(" ")
                 version = versionArr[3]
+
                 logger.debug("MariaDB discoverd version is : "+version)
+
                 if (version != "" and baseName == "mysqld"):
                     prettyName = versionStr[versionStr.index(
                         "(MariaDB"):len(versionStr)]
@@ -354,55 +357,49 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
 
         logger.debug("source_conection > "+sourceConn)
         logger.debug("staging_conection > "+stagingConn)
-        logger.debug(source_config.base_dir)
-        # This condition will help taking care of snapshot wit parameters
-        # in case we need to resync the dsource from a new backup
 
+        # check if port is up to allow connection to database
+        # check if db exists may be we need a connection select from maria
+        # stop database
+        # do a system cleanup removing directories from os
+        # logger.debug(staged_source.parameters.name)
+        # logger.debug(staged_source.parameters.port)
         if linked_status(staged_source, repository, source_config) == Status.ACTIVE:
             logger.debug("Check if db exists")
-            db_exists = "mysql %s%s --protocol=TCP --port=%s -se \"SHOW DATABASES like '%s'\"" % (
-                stagingConn, staged_source.parameters.staging_pass, staged_source.parameters.staging_port, source_config.db_name)
+            db_exists = "mysql %s%s --protocol=TCP --port=3308 -se \"SHOW DATABASES like 'employees'\"" % (
+                stagingConn, staged_source.parameters.staging_pass)
+            logger.debug("************************************")
             logger.debug(
-                "found an existing database with the name : {}".format(source_config.db_name))
+                "****** COMMAND FOR CHECKING DATABASE EXISTENCE > "+db_exists)
+            logger.debug("************************************")
+            logger.debug(
+                "found an existing database with the name : {}".format(db_exists))
             result = libs.run_bash(
-                staged_source.staged_connection, db_exists, variables=None, check=False)
-
-            logger.debug("stop MariaDB process running on this port")
-            kill_mysql_procs = "mysqladmin %s'%s' --protocol=TCP --port=%s shutdown --shutdown-timeout=20" % (
-                stagingConn, staged_source.parameters.staging_pass, staged_source.parameters.staging_port)
+                staged_source.staged_connection, db_exists, variables=None, check=True)
+            output = result.stdout.strip()
+            logger.debug("************************************")
+            logger.debug(
+                "****** RESULT OF CHECKING DATABASE EXISTENCE > "+output)
+            logger.debug("************************************")
+#            stop_staging(staged_source, repository, source_config)
+# fuser -k 3306/tcp
+            logger.debug("kill mysql process running on this port")
+            kill_mysql_procs = "fuser -k 3308/tcp"
             logger.debug(
                 "Cleaning all mysql procs using 3308 port > "+kill_mysql_procs)
             result = libs.run_bash(
-                staged_source.staged_connection, kill_mysql_procs, variables=None, check=False)
-            output = result.stdout.strip()
-            error = result.stderr.strip()
-            exit_code = result.exit_code
-            if exit_code != 0:
-                logger.debug("Error is : "+error)
-                raise LinkingException(
-                    "Exception while stopping mysql process on this port : "+error)
-            else:
-                logger.debug(
-                    "Stop mysql process this port - Successful: "+output)
+                staged_source.staged_connection, kill_mysql_procs, variables=None, check=True)
+#            output = result.stdout.strip()
 
             logger.debug("system clean up")
-            fs_clean = "sudo rm -rf %s/*" % (
-                mount_path)
+            fs_clean = "rm -rf %s" % (mount_path)
             logger.debug(
                 "Cleaning up fs with command > "+fs_clean)
             result = libs.run_bash(
-                staged_source.staged_connection, fs_clean, variables=None, check=False)
-            output = result.stdout.strip()
-            logger.debug(output)
-
-            logger.debug("results after clean up")
-            list_fs = "ls -ltr %s/*/*" % (mount_path)
-            logger.debug(
-                "Cleaning up fs with command > "+fs_clean)
-            result = libs.run_bash(
-                staged_source.staged_connection, list_fs, variables=None, check=False)
-            output = result.stdout.strip()
-            logger.debug(output)
+                staged_source.staged_connection, fs_clean, variables=None, check=True)
+#            output = result.stdout.strip()
+        # if output:
+        # sss
 
         if dSourceType == "Replication":
             logger.debug(
@@ -430,7 +427,7 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 "STAGINGDATADIR": mount_path,
                 "STAGINGHOSTIP": staging_ip
             }
-            logger.debug("Taking or Using existing : Source BackUp")
+            logger.debug("Taking Source BackUp")
             backup_script = pkgutil.get_data('resources', 'restore.sh')
             result = libs.run_bash(
                 staged_source.staged_connection, backup_script, environment_vars, check=True)
@@ -753,7 +750,7 @@ def stop_mysql(port, connection, baseDir, user, pwd, host):
         exit_code = result.exit_code
         if exit_code != 0:
             logger.debug(
-                "There was an error trying to  the database : "+error)
+                "There was an error trying to shutdown the database : "+error)
             # raise MySQLShutdownException(error)
         else:
             logger.debug("Output: "+output)
@@ -763,7 +760,7 @@ def stop_mysql(port, connection, baseDir, user, pwd, host):
                 "MariaDB has not shutdown after 20 seconds. Killing process.")
             kill_process(connection, port)
     else:
-        logger.debug(" MariaDB database is already .")
+        logger.debug(" MariaDB database is already shutdown.")
 
 ##################################################
 # Function to Kill a Process
