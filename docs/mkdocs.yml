@@ -1,5 +1,5 @@
 site_name: Delphix MariaDB Plugin
-site_url: https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux
+#site_url: https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux
 theme:
   name: material
   custom_dir: 'material/'

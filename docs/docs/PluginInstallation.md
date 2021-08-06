@@ -13,7 +13,7 @@
 
 1. Click on **Manage** (present on top-left of this page) and then **Plugins**.  
    
-      ![Screenshot](./image/image2.png)
+      ![Screenshot](/image/image2.png)
 
 
 2. Click on **+** icon.  
@@ -33,12 +33,12 @@
 
 5. Click on **close** button.  
    
-      ![Screenshot](./image/Image6.png)
+      ![Screenshot](./image/image6.png)
 
 
 6. See the plugin version in **Plugins** section.  
    
-      ![Screenshot](./image/Image7.png)
+      ![Screenshot](./image/image7.png)
 
 
 ### Method2: Using dvp command
