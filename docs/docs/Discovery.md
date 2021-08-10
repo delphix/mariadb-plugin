@@ -65,4 +65,4 @@ For the MariaDB plugin, Source config is must be created manually.
 
 
 Now that your environments are all added and a Source Config has been created, 
-please proceed to [Linking](/Linking/Replication_Mode/index.html) page to see how we can create the dSource.
+please proceed to [Linking](./Linking/Replication_Mode/index.html) page to see how we can create the dSource.
