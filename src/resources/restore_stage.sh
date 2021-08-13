@@ -210,7 +210,7 @@ else
    log "Since the above file was missing, Creating my.cnf file ..."
    echo "[mysqld]" > ${NEW_MY_CNF}
    echo "server-id               = ${NEW_SERVER_ID}" >> ${NEW_MY_CNF}
-   if [ ${MYSQLVER} -gt "10.2.39" ] 
+   if [ $(version ${MYSQLVER}) -ge $(version 10.2.39) ] 
    then
       echo "binlog-format           = mixed" >> ${NEW_MY_CNF}
    else
