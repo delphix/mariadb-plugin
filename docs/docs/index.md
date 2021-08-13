@@ -18,12 +18,12 @@ the Delphix dSource in-sync with the MariaDB source databases.
 Creation of the dSource requires a full backup of the source database(s) and there are
 two options to providing this backup. 
 
-1. Delphix Managed Backup 
+* **Delphix Managed Backup**
    
     In this option, Delphix is provided with the required information to take 
     a full backup of the source database.
     
-2. User Provided Backup 
+* **User Provided Backup**
    
     In this option, user provides Delphix with an existing full backup. 
     Delphix initializes the staging database using the full backup and configures the 
@@ -41,7 +41,7 @@ Where to Start?
 By now, you must have an overall idea of what is possible with the MariaDB plugin. 
 Before you can get started with virtualizing your MariaDB databases, 
 there are some pre-requisites you need to take care of. 
-Please visit the [Pre-Requisites](/Pre-Requisites/General/index.html) page for more details. 
+Please visit the [Pre-Requisites](./Pre-Requisites/General/index.html) page for more details. 
 
 Questions?
 ----------------
