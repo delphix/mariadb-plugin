@@ -133,6 +133,8 @@ log "Source --basedir=${SOURCEBASEDIR}"
 log "Source --datadir=${SOURCEDATADIR}"
 log "Creating Initial Database ..."
 
+function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; }
+
 # Create Initial Database 10.3 or below ..
 
    #log "sudo ${MYSQLD}/mysqld --initialize --user=mysql --datadir=${NEW_DATA_DIR} --log-error=${NEW_DATA_DIR}/mysqld.log"
@@ -140,7 +142,7 @@ log "Creating Initial Database ..."
 
   log "Using mysql_install_db ..."
 
-   if [ ${MYSQLVER} -ge "10.4.0" ] 
+   if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
    then
       log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR}"
       sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1

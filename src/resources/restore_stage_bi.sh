@@ -78,6 +78,7 @@ log "MariaDB Version: ${MYSQLVER}"
 log "Source --basedir=${SOURCEBASEDIR}"
 log "Source --datadir=${SOURCEDATADIR}"
 
+function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; }
 
 # Create Initial Database 5.7 or later ...
 log "Creating Initial Database ..."
@@ -86,7 +87,7 @@ log "Using mysql_install_db ..."
 #log "${MYSQLD}/mysqld --initialize --user=mysql --datadir=${NEW_DATA_DIR} --log-error=${NEW_DATA_DIR}/mysqld.log"
 #${MYSQLD}/mysqld --initialize --user=mysql --datadir=${NEW_DATA_DIR} --log-error=${NEW_DATA_DIR}/mysqld.log 1>>${DEBUG_LOG} 2>&1
 
-   if [ ${MYSQLVER} -ge "10.4.0" ] 
+   if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
    then
       log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR}"
       sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
