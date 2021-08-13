@@ -225,7 +225,7 @@
              "format": "password",
              "prettyName": "Replication User's Password",
              "description": "* Required if using Replication Method with LogSync",
-             "default": "delphix"
+             "default": "delphixdb"
           },
           "stagingPass": {
              "type": "string",

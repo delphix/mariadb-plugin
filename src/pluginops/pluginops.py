@@ -209,8 +209,13 @@ def start_staging(staged_source, repository, source_config):
         logger.debug("error:"+error)
         exit_code = result.exit_code
         if exit_code != 0:
-            logger.debug("There was an error> "+error)
-            raise LinkingException("Exception while Starting Stage:"+error)
+            logger.debug(
+                "There was an error trying to start statging DB : "+error)
+            raise UserError(
+                constants.ERR_START_MSG,
+                constants.ERR_START_ACTION,
+                "ExitCode:{} \n {}".format(exit_code, error)
+            )
         else:
             logger.debug("Start Staging - Successful")
     # elif staged_source.parameters.d_source_type == "Manual Backup Ingestion":
@@ -238,8 +243,13 @@ def start_staging(staged_source, repository, source_config):
         logger.debug("error:"+error)
         exit_code = result.exit_code
         if exit_code != 0:
-            logger.debug("Error is : "+error)
-            raise LinkingException("Exception while Starting Stage:"+error)
+            logger.debug(
+                "There was an error trying to start statging DB : "+error)
+            raise UserError(
+                constants.ERR_START_MSG,
+                constants.ERR_START_ACTION,
+                "ExitCode:{} \n {}".format(exit_code, error)
+            )
         else:
             logger.debug("Start Staging - Successful")
 
@@ -272,8 +282,13 @@ def stop_staging(staged_source, repository, source_config):
         error = result.stderr.strip()
         exit_code = result.exit_code
         if exit_code != 0:
-            logger.debug("Error is : "+error)
-            raise LinkingException("Exception while stopping staging:"+error)
+            logger.debug(
+                "There was an error trying to stop statging DB : "+error)
+            raise UserError(
+                "Exception while stopping staging",
+                "Check the log file for database",
+                "ExitCode:{} \n {}".format(exit_code, error)
+            )
         else:
             logger.debug("Stop Staging - Successful: "+output)
     elif staged_source.parameters.d_source_type == "Manual Backup Ingestion":
@@ -296,8 +311,12 @@ def stop_staging(staged_source, repository, source_config):
         error = result.stderr.strip()
         exit_code = result.exit_code
         if exit_code != 0:
-            logger.debug("Error is : "+error)
-            raise LinkingException("Exception while stopping staging:"+error)
+            logger.debug("There was an error trying to stop the DB : "+error)
+            raise UserError(
+                "Exception while stopping staging",
+                "Check the log file for database",
+                "ExitCode:{} \n {}".format(exit_code, error)
+            )
         else:
             logger.debug("Stop Staging - Successful: "+output)
     else:
@@ -319,8 +338,13 @@ def stop_staging(staged_source, repository, source_config):
         error = result.stderr.strip()
         exit_code = result.exit_code
         if exit_code != 0:
-            logger.debug("Error is : "+error)
-            raise LinkingException("Exception while stopping staging:"+error)
+            logger.debug(
+                "There was an error trying to stop staging DB : "+error)
+            raise UserError(
+                "Exception while stopping staging",
+                "Check the log file for database",
+                "ExitCode:{} \n {}".format(exit_code, error)
+            )
         else:
             logger.debug("Stop Staging - Successful: "+output)
         # TODO: Integration
@@ -380,9 +404,13 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             error = result.stderr.strip()
             exit_code = result.exit_code
             if exit_code != 0:
-                logger.debug("Error is : "+error)
-                raise LinkingException(
-                    "Exception while stopping mysql process on this port : "+error)
+                logger.debug(
+                    "There was an error while stopping mysql process on this port : "+error)
+                raise UserError(
+                    "Exception while stopping mysql process on this port",
+                    "",
+                    "ExitCode:{} \n {}".format(exit_code, error)
+                )
             else:
                 logger.debug(
                     "Stop mysql process this port - Successful: "+output)
@@ -435,15 +463,18 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             logger.debug("Taking or Using existing : Source BackUp")
             backup_script = pkgutil.get_data('resources', 'restore.sh')
             result = libs.run_bash(
-                staged_source.staged_connection, backup_script, environment_vars, check=True)
+                staged_source.staged_connection, backup_script, environment_vars)
             output = result.stdout.strip()
             error = result.stderr.strip()
             exit_code = result.exit_code
-            logger.debug(output)
             if exit_code != 0:
-                logger.debug("Error is : "+error)
-                raise LinkingException(
-                    "Exception in pre-snapshot/restore:"+error)
+                logger.debug(
+                    "There was an error Taking or Using existing database backup: "+error)
+                raise UserError(
+                    constants.ERR_CONNECT_MSG,
+                    constants.ERR_CONNECT_ACTION,
+                    "ExitCode:{} \n {}".format(exit_code, error)
+                )
             else:
                 logger.debug("Pre-Snapshot/Restore successful "+output)
             logger.debug("Restoring Backup to Stage")
@@ -486,14 +517,18 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             restore_script = pkgutil.get_data(
                 'resources', 'restore_stage_bi.sh')
             result = libs.run_bash(
-                staged_source.staged_connection, restore_script, environment_vars, check=True)
+                staged_source.staged_connection, restore_script, environment_vars)
             output = result.stdout.strip()
             error = result.stderr.strip()
             exit_code = result.exit_code
             if exit_code != 0:
-                logger.debug("Error is : "+error)
-                raise LinkingException(
-                    "Exception in pre-snapshot/restore_db:"+error)
+                logger.debug(
+                    "There was an error during initialization of MariaDB seed database : "+error)
+                raise UserError(
+                    constants.ERR_RESTORE_ACTION,
+                    constants.ERR_RSTORE_ACTION,
+                    "ExitCode:{} \n {}".format(exit_code, error)
+                )
             else:
                 logger.debug("Pre-Snapshot/Restore_DB successful "+output)
         else:
@@ -532,9 +567,13 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             error = result.stderr.strip()
             exit_code = result.exit_code
             if exit_code != 0:
-                logger.debug("There was an error while resync : "+error)
-                raise LinkingException(
-                    "Exception in pre-snapshot/restore_db:"+error)
+                logger.debug(
+                    "There was an error  while resync: "+error)
+                raise UserError(
+                    "There was an error while resync",
+                    "",
+                    "ExitCode:{} \n {}".format(exit_code, error)
+                )
             else:
                 logger.debug("Pre-Snapshot/Restore_DB successful "+output)
 
@@ -641,8 +680,12 @@ def linked_status(staged_source, repository, source_config):
     error = result.stderr.strip()
     exit_code = result.exit_code
     if exit_code != 0:
-        logger.debug("Exception while checking Staging DB Status : "+error)
-        # ignore status?
+        logger.debug(
+            "Exception while checking Staging DB Status : "+error)
+        raise UserError("Exception while checking Staging DB Status",
+                        "",
+                        "ExitCode:{} \n {}".format(exit_code, error)
+                        )
     else:
         logger.debug("Staging Status Check: "+output)
     if output == "ACTIVE":
@@ -756,8 +799,12 @@ def stop_mysql(port, connection, baseDir, user, pwd, host):
         exit_code = result.exit_code
         if exit_code != 0:
             logger.debug(
-                "There was an error trying to  the database : "+error)
+                "There was an error trying to stop  the database : "+error)
             # raise MySQLShutdownException(error)
+            raise UserError("Exception while stopping the database",
+                            "",
+                            "ExitCode:{} \n {}".format(exit_code, error)
+                            )
         else:
             logger.debug("Output: "+output)
         time.sleep(20)
@@ -1052,8 +1099,13 @@ def repository_discovery(source_connection):
     error = result.stderr.strip()
     exit_code = result.exit_code
     if exit_code != 0:
-        logger.debug("Error is : "+error)
-        raise RepositoryDiscoveryError("Exception while discovering:"+error)
+        logger.debug("Error during repoDiscovery process : "+error)
+#        raise RepositoryDiscoveryError("Exception while discovering:"+error)
+        raise UserError(
+            "Error during repoDiscovery process",
+            "",
+            "ExitCode:{} \n {}".format(exit_code, error)
+        )
     else:
         logger.debug("Output: "+output)
         # process repository json

@@ -65,8 +65,8 @@ then
    # Source Connection for Backup ...
    #
    masklog "Source Connection: ${SOURCECONN}"
-   #RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
-   RESULTS=$( buildConnectionString "${SOURCECONN}" "${REPLICATION_PASS}" "${SOURCEPORT}" "${SOURCEIP}" )
+   RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
+   #RESULTS=$( buildConnectionString "${SOURCECONN}" "${REPLICATION_PASS}" "${SOURCEPORT}" "${SOURCEIP}" )
    #log "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"
    SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
    masklog "New Conn: ${SOURCE_CONN}"

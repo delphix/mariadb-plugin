@@ -140,9 +140,14 @@ log "Creating Initial Database ..."
 
   log "Using mysql_install_db ..."
 
-   log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR}"
-   sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
-
+   if [ ${MYSQLVER} -gt "10.2.39" ] 
+   then
+      log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR}"
+      sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
+   else
+      log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR}"
+      sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
+   fi
 
    TMP_PWD=""
    log "Temporary password: ${PWD_LINE}"
