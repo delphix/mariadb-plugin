@@ -1100,7 +1100,6 @@ def repository_discovery(source_connection):
     exit_code = result.exit_code
     if exit_code != 0:
         logger.debug("Error during repoDiscovery process : "+error)
-#        raise RepositoryDiscoveryError("Exception while discovering:"+error)
         raise UserError(
             "Error during repoDiscovery process",
             "",

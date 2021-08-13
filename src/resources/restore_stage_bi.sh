@@ -397,11 +397,21 @@ fi
 #CMD="${INSTALL_BIN}/mysql ${STAGING_CONN} --connect-expired-password -se \"ALTER USER 'root'@'localhost' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
 #log "Final Command to Change Password is : ${CMD}"
 
-# Use instead the mysqladmin command to set root password
-CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
-CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
-masklog "Final Command to Change Password is : ${CMD}"
-
+   if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
+   then
+      # Use instead the mysqladmin command to set root password
+#      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      #STAGINHOSTNAME=$(hostname)
+      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -e \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED VIA mysql_native_password USING PASSWORD(${STAGINGPASS});FLUSH PRIVILEGES;\""
+#      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -e \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED VIA mysql_native_password USING PASSWORD(${STAGINGPASS});FLUSH PRIVILEGES;\""
+      masklog "Final Command to Change Password is : ${CMD}"
+   else
+      # Use instead the mysqladmin command to set root password
+      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      masklog "Final Command to Change Password is : ${CMD}"   
+   fi
 
 #eval ${CMD} 1>>${DEBUG_LOG} 2>&1
 return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)

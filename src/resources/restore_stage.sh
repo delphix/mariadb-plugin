@@ -471,9 +471,25 @@ fi
 #CMD="${INSTALL_BIN}/mysql ${STAGING_CONN} --connect-expired-password -se \"ALTER USER 'root'@'localhost' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
 
 # Use instead the mysqladmin command to set root password
-CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
-CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
-masklog "Final Command to Change Password is : ${CMD}"
+#CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+#CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+#masklog "Final Command to Change Password is : ${CMD}"
+
+if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
+   then
+      # Use instead the mysqladmin command to set root password
+#      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      #STAGINHOSTNAME=$(hostname)
+      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -e \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED VIA mysql_native_password USING PASSWORD(${STAGINGPASS});FLUSH PRIVILEGES;\""
+#      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -e \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED VIA mysql_native_password USING PASSWORD(${STAGINGPASS});FLUSH PRIVILEGES;\""
+      masklog "Final Command to Change Password is : ${CMD}"
+   else
+      # Use instead the mysqladmin command to set root password
+      CMD="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      CMDFORLOG="${INSTALL_BIN}/mysql -uroot --host=${STAGINGHOSTIP} --protocol=TCP --port=${STAGINGPORT} --password=\"\" -se \"ALTER USER 'root'@'${STAGINGHOSTIP}' IDENTIFIED BY ${STAGINGPASS};UPDATE mysql.user SET authentication_string=PASSWORD(${STAGINGPASS}) where USER='root';FLUSH PRIVILEGES;\""
+      masklog "Final Command to Change Password is : ${CMD}"   
+   fi
 
 #eval ${CMD} 1>>${DEBUG_LOG} 2>&1
 return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)
@@ -644,13 +660,11 @@ then
    echo "MASTER_LOG_POS=${BINLOG_POSITION};" >> ${TMPLOG}.sql
    echo "START SLAVE;" >> ${TMPLOG}.sql
    echo "SHOW SLAVE STATUS\G" >> ${TMPLOG}.sql
-
    ##DEBUG##
    ##log "Staging Connection: ${STAGING_CONN}"
    ##TMP=`cat ${TMPLOG}.sql`
    ##log "Slave Master SQL: ${TMP}"
    ##log "${INSTALL_BIN}/mysql ${STAGING_CONN} -vvv < ${TMPLOG}.sql > ${TMPLOG}.out"
-
    #
    # Start Slave ...
    #
@@ -663,7 +677,6 @@ then
    fi
    RESULTS=`cat ${TMPLOG}.out | tr '\n' '|'`
    log "Starting Slave Results: ${RESULTS}"
-
    if [[ -f "${TMPLOG}.sql" ]] 
    then
       rm "${TMPLOG}.sql" 2>/dev/null
@@ -672,20 +685,15 @@ then
    then
       rm "${TMPLOG}.out" 2>/dev/null
    fi
-
    log "Checking Slave Status ..."
    masklog "${INSTALL_BIN}/mysql ${STAGING_CONN} -se \"SHOW SLAVE STATUS\G\""
    RESULTS=$(${INSTALL_BIN}/mysql ${STAGING_CONN} -se "SHOW SLAVE STATUS\G")
    log "Slave Status: ${RESULTS}"
-
    # A parting tip: Sometimes errors occur in replication. 
    # For example, if you accidentally change a row of data on your slave. 
    # If this happens, fix the data, then run:
-
    #STOP SLAVE;SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1;START SLAVE;
-
 fi    		# end if $LOGSYNC ...
-
  
 # This section has been commented to enable Staging Target run 
 # Anything with two ## are lines of code

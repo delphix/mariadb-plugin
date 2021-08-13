@@ -64,12 +64,19 @@ then
    # 
    # Source Connection for Backup ...
    #
+
+   if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
+   then
+   STAGINGHOSTNAME=$(hostname)
+   SOURCE_CONN="-u${SOURCEUSER} --host=${STAGINGHOSTNAME} -p${SOURCEPASS} --protocol=TCP --port=${SOURCEPORT}"
+   else
    masklog "Source Connection: ${SOURCECONN}"
    RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
    #RESULTS=$( buildConnectionString "${SOURCECONN}" "${REPLICATION_PASS}" "${SOURCEPORT}" "${SOURCEIP}" )
    #log "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"
    SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
    masklog "New Conn: ${SOURCE_CONN}"
+   fi
 
    log "Source Backup Host: ${SOURCEIP}"
 
