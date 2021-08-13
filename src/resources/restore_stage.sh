@@ -140,7 +140,7 @@ log "Creating Initial Database ..."
 
   log "Using mysql_install_db ..."
 
-   if [ ${MYSQLVER} -gt "10.2.39" ] 
+   if [ ${MYSQLVER} -ge "10.4.0" ] 
    then
       log "sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR}"
       sudo ${INSTALL_BIN}/mysql_install_db --user=mysql --auth-root-authentication-method=normal --datadir=${NEW_DATA_DIR} 1>>${DEBUG_LOG} 2>&1
