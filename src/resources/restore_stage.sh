@@ -538,7 +538,6 @@ then
       sed -i "/^CREATE USER \`\`@.*/d" ${BKUP_FILE}
    fi
 fi
-cp ${BKUP_FILE} /tmp/msa_changed
 
 ## Ingest Backup File
 CMD="${INSTALL_BIN}/mysql ${STAGING_CONN} < ${BKUP_FILE}"
