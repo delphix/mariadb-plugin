@@ -61,19 +61,25 @@ then
       rm ${BKUP_FILE}
    fi
 
+   function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; }
    # 
    # Source Connection for Backup ...
    #
 
    if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
    then
-   STAGINGHOSTNAME=$(hostname)
-   SOURCE_CONN="-u${SOURCEUSER} --host=${STAGINGHOSTNAME} -p${SOURCEPASS} --protocol=TCP --port=${SOURCEPORT}"
+   #masklog "Source Connection: ${SOURCECONN}"
+   #STAGINGHOSTNAME=$(hostname)
+   #SOURCE_CONN="-u${SOURCEUSER} --host=${STAGINGHOSTNAME} -p${SOURCEPASS} --protocol=TCP --port=${SOURCEPORT}"
+   ##SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
+   #masklog "New Conn: ${SOURCE_CONN}"
+   masklog "Source Connection: ${SOURCECONN}"
+   RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
+   SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
+   masklog "New Conn: ${SOURCE_CONN}"
    else
    masklog "Source Connection: ${SOURCECONN}"
    RESULTS=$( buildConnectionString "${SOURCECONN}" "${SOURCEPASS}" "${SOURCEPORT}" "${SOURCEIP}" )
-   #RESULTS=$( buildConnectionString "${SOURCECONN}" "${REPLICATION_PASS}" "${SOURCEPORT}" "${SOURCEIP}" )
-   #log "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"
    SOURCE_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
    masklog "New Conn: ${SOURCE_CONN}"
    fi
@@ -126,22 +132,29 @@ then
 
       log "LogSync Enabled: ${LOGSYNC}"
       if [[ "${LOGSYNC}" == "true" ]]
-      then 
-         log "Backup CMD: ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A"
-         ##log "Backup CMD: ${INSTALL_BIN}/mysqldump ******** --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A > ${BKUP_FILE}"
-         ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A  > ${BKUP_FILE}
-         return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)
+      then
+         if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
+            then
+            log "Backup CMD: ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A --system=users"
+            ##log "Backup CMD: ${INSTALL_BIN}/mysqldump ******** --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A > ${BKUP_FILE}"
+            ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A  --system=users > ${BKUP_FILE}
+            return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)
+         else
+            log "Backup CMD: ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A"
+            ##log "Backup CMD: ${INSTALL_BIN}/mysqldump ******** --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A > ${BKUP_FILE}"
+            ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob --master-data=2 -A > ${BKUP_FILE}
+            return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)         
+         fi
          return_code=$?
          log "Return Status for backup dump : ${return_code}"
          log "Return message for backup dump :${return_msg}"
          if [ $return_code != 0 ]; then
            terminate "${return_msg}" 8
          fi
-
       else 
          log "Backup CMD: ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob"
          ##log "Backup CMD: ${INSTALL_BIN}/mysqldump ******** --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob > ${BKUP_FILE}"
-         ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob > ${BKUP_FILE}
+         ${INSTALL_BIN}/mysqldump ${SOURCE_CONN} --all-databases --skip-lock-tables --single-transaction --flush-logs --hex-blob> ${BKUP_FILE}
          return_msg=$(eval ${CMD} 2>&1 1>&2 > /dev/null)
          return_code=$?
          log "Return Status for backup dump : ${return_code}"
