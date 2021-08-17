@@ -534,7 +534,7 @@ then
    sed -i "/^CREATE USER \`mariadb.sys\`@\`localhost\`.*/d" ${BKUP_FILE} 
    sed -i "/^CREATE USER \`root\`@\`localhost\`.*/d" ${BKUP_FILE} 
    sed -i "/^CREATE USER \`mysql\`@\`localhost\`.*/d" ${BKUP_FILE} 
-   if grep -q "^CREATE USER \`\`@.*/d" ${BKUP_FILE}; then
+   if grep -q "^CREATE USER \`\`@.*" ${BKUP_FILE}; then
       sed -i "/^CREATE USER \`\`@.*/d" ${BKUP_FILE}
    fi
 fi
