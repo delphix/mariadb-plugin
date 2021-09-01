@@ -438,7 +438,7 @@ buildConnectionString () {
    ZIP=${4}
    # Source Connection for Backup ...
    masklog "Connection Input: ${ZCONN}"
-   ZSTRING="${ZCONN} --protocol=TCP --port=${ZPORT}  --host=${ZIP}"  
+   ZSTRING="${ZCONN} --protocol=TCP --port=${ZPORT}  --host=${ZIP}"
    if [[ "${ZCONN}" = *" -p"* ]] && [[ "${ZPASS}" != "" ]]
    then
       P1=`echo "${ZCONN}" | ${AWK} -F" -p" '{print $1}' | ${XARGS}`

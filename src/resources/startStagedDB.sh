@@ -21,10 +21,11 @@ log "Library Load Status: $result"
 printParams
 
 # These passwords contain special characters so need to wrap in single / literal quotes ...
-STAGINGPASS=`echo "'"${STAGINGPASS}"'"`
+#STAGINGPASS=`echo "'"${STAGINGPASS}"'"`
+SOURCEPASS=`echo "'"${SOURCEPASS}"'"`
 masklog "Staging Connection: ${STAGINGCONN}"
-RESULTS=$( buildConnectionString "${STAGINGCONN}" "${STAGINGPASS}" "${STAGINGPORT}" )
-#log "${RESULTS}"
+#RESULTS=$( buildConnectionString "${STAGINGCONN}" "${STAGINGPASS}" "${STAGINGPORT}" )
+RESULTS=$( buildConnectionString "${STAGINGCONN}" "${SOURCEPASS}" "${STAGINGPORT}" )
 STAGING_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
 masklog "Staging Connection: ${STAGING_CONN}"
 
@@ -63,10 +64,10 @@ else
    log "Database is Already Started"
 fi
 
-#log "Environment: "
-#export DLPX_LIBRARY_SOURCE=""
-#export REPLICATION_PASS=""
-#export STAGINGPASS=""
-#env | sort  >>$DEBUG_LOG
+log "Environment: "
+export DLPX_LIBRARY_SOURCE=""
+export REPLICATION_PASS=""
+export STAGINGPASS=""
+env | sort  >>$DEBUG_LOG
 log "End"
 exit 0

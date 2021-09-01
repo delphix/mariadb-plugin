@@ -284,8 +284,8 @@ eval ${CMD} 1>>${DEBUG_LOG} 2>&1
 
 log "Environment: "
 export DLPX_LIBRARY_SOURCE=""
-#export REPLICATION_PASS=""
-#export STAGINGPASS=""
+export REPLICATION_PASS=""
+export STAGINGPASS=""
 env | sort  >>$DEBUG_LOG
 log "------------------------- End"
 exit 0

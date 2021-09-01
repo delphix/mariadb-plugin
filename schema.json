@@ -230,8 +230,8 @@
           "stagingPass": {
              "type": "string",
              "format": "password",
-             "prettyName": "Staging Initialization Password",
-             "description": "root user password to use while initializing Staging DB.",
+             "prettyName": "(Replication : Source User root Password). OR (Manual Ingest : Staging Initialization Password.)",
+             "description": "(Replication : root user password to connect to source localhost account.) OR (Manual Ingest : root user password to use while initializing Staging DB.)",
              "default": "delphixdb"
           },
           "serverId": {

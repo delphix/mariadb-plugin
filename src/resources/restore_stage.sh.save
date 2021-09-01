@@ -98,7 +98,7 @@ NEW_MY_CNF="${NEW_MOUNT_DIR}/my.cnf"
 NEW_SERVER_ID="${STAGINGSERVERID}"
 
 
-###########################################################
+##
 ## On Staging Server ...
 
 # scp from source server the ${BKUP_FILE}
@@ -178,7 +178,7 @@ function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; 
 
 masklog "Creation Results: ${RESULTS}"
 
-############################################################
+
 ##
 log "Creating Staging Directories on NFS Mounted Path from Delphix ..."
 
@@ -226,7 +226,7 @@ else
    echo "tmpdir=${NEW_TMP_DIR}" >> ${NEW_MY_CNF}
    echo "socket=${NEW_MOUNT_DIR}/mysql.sock" >> ${NEW_MY_CNF}
    echo "port=${TARGET_PORT}" >> ${NEW_MY_CNF}
-   ###echo "sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES" >> ${NEW_MY_CNF}
+   echo "sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES" >> ${NEW_MY_CNF}
    echo "log-error=${NEW_MOUNT_DIR}/mysqld_error.log" >> ${NEW_MY_CNF}
    echo "" >> ${NEW_MY_CNF}
    echo "[mysqld_safe]" >> ${NEW_MY_CNF}
@@ -463,7 +463,7 @@ fi
 #REMOVE=`rm /tmp/mysql.sock`   # ignore errors
 #SOCK_SYM_LINK=`ln -s $SOCKLN /tmp/mysql.sock`
 
-########################################################################
+
 #
 # Change Password for Staging Conn ...
 #
@@ -500,17 +500,20 @@ if [ $return_code != 0 ]; then
   terminate "${return_msg}" 5
 fi
 
+##echo "Checking all evirnoments befor creation conn string" >> ${DEBUG_LOG} 
+##env >> ${DEBUG_LOG} 
 #
 # Update Staging Connection with supplied password ...
 #
 masklog "Staging Connection Prior to updaging password : ${STAGINGCONN}"
-RESULTS=$( buildConnectionString "${STAGINGCONN}" "${STAGINGPASS}" "${STAGINGPORT}" "${STAGINGHOSTIP}" )
+#RESULTS=$( buildConnectionString "${STAGINGCONN}" "${STAGINGPASS}" "${STAGINGPORT}" "${STAGINGHOSTIP}" )
+RESULTS=$( buildConnectionString "${STAGINGCONN}" "${SOURCEPASS}" "${STAGINGPORT}" "${STAGINGHOSTIP}" )
 echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"
 STAGING_CONN=`echo "${RESULTS}" | $DLPX_BIN_JQ --raw-output ".string"`
-log "============================================================"
-masklog "Staging Connection after updating password: ${STAGING_CONN}"
-log "============================================================"
-########################################################################
+masklog "============================================================"
+log "Staging Connection after updating password: ${STAGING_CONN}"
+
+
 #
 # Load Source Database Export ...
 #
@@ -518,15 +521,15 @@ log "============================================================"
 log "Restoring Backup File "
 log "============================================================"
 #log "${INSTALL_BIN}/mysql ******* < ${BKUP_FILE}"
-masklog "${INSTALL_BIN}/mysql ${STAGING_CONN} < ${BKUP_FILE}"
+log "${INSTALL_BIN}/mysql ${STAGING_CONN} < ${BKUP_FILE}"
 #RESULTS=$( ${INSTALL_BIN}/mysql ${STAGING_CONN} < ${BKUP_FILE} )
-#log "Restore Results: ${RESULTS}"
+#masklog "Restore Results: ${RESULTS}"
 
 ## Reset Master before restoring backup
 ##RESET_MASTER="${DLPX_TOOLKIT}/reset_master.sql"
 ##echo "RESET MASTER;" > ${RESET_MASTER}
 CMD="${INSTALL_BIN}/mysql ${STAGING_CONN} -e \"RESET MASTER;\""
-masklog "Reset Master Command:  ${CMD}"       # TODO REMOVE
+log "Reset Master Command:  ${CMD}"       # TODO REMOVE
 eval ${CMD} 1>>${DEBUG_LOG} 2>&1
 
 if [ $(version ${MYSQLVER}) -ge $(version 10.4.0) ] 
@@ -548,7 +551,6 @@ log "Return message for ingest backup:${return_msg}"
 if [ $return_code != 0 ]; then
   terminate "${return_msg}" 6
 fi
-
 
 log "====== Validating Restored Databases ======"
 #RESULTS=`${INSTALL_BIN}/mysql ${STAGING_CONN} -e "show databases;"`
@@ -660,7 +662,7 @@ then
    #
    TMPLOG="${DLPX_TOOLKIT}/tmp4"
    echo "STOP SLAVE;" > ${TMPLOG}.sql
-   echo "RESET SLAVE;" > ${TMPLOG}.sql
+   echo "RESET SLAVE;" >> ${TMPLOG}.sql
    echo "CHANGE MASTER TO MASTER_HOST='${MASTER_HOST}'," >> ${TMPLOG}.sql
    echo "MASTER_PORT=${MASTER_PORT}," >> ${TMPLOG}.sql
    echo "MASTER_USER='${MASTER_USER}'," >> ${TMPLOG}.sql
@@ -669,18 +671,17 @@ then
    echo "MASTER_LOG_POS=${BINLOG_POSITION};" >> ${TMPLOG}.sql
    echo "START SLAVE;" >> ${TMPLOG}.sql
    echo "SHOW SLAVE STATUS\G" >> ${TMPLOG}.sql
-
    ##DEBUG##
-   masklog "Staging Connection: ${STAGING_CONN}"
+   ##log "Staging Connection: ${STAGING_CONN}"
    ##TMP=`cat ${TMPLOG}.sql`
    ##log "Slave Master SQL: ${TMP}"
    ##log "${INSTALL_BIN}/mysql ${STAGING_CONN} -vvv < ${TMPLOG}.sql > ${TMPLOG}.out"
-
    #
    # Start Slave ...
    #
    log "Starting Slave ..."
    RESULTS=$(${INSTALL_BIN}/mysql ${STAGING_CONN} -vvv < ${TMPLOG}.sql > ${TMPLOG}.out)
+   log "$RESULTS"
    return_code=$?
    log "Return Status for starting slave: ${return_code}"
    if [ $return_code != 0 ]; then
@@ -688,29 +689,23 @@ then
    fi
    RESULTS=`cat ${TMPLOG}.out | tr '\n' '|'`
    log "Starting Slave Results: ${RESULTS}"
-
-   if [[ -f "${TMPLOG}.sql" ]] 
-   then
-      rm "${TMPLOG}.sql" 2>/dev/null
-   fi
-   if [[ -f "${TMPLOG}.out" ]] 
-   then
-      rm "${TMPLOG}.out" 2>/dev/null
-   fi
-
+#   if [[ -f "${TMPLOG}.sql" ]] 
+#   then
+#      rm "${TMPLOG}.sql" 2>/dev/null
+#   fi
+#   if [[ -f "${TMPLOG}.out" ]] 
+#   then
+#      rm "${TMPLOG}.out" 2>/dev/null
+#   fi
    log "Checking Slave Status ..."
    masklog "${INSTALL_BIN}/mysql ${STAGING_CONN} -se \"SHOW SLAVE STATUS\G\""
    RESULTS=$(${INSTALL_BIN}/mysql ${STAGING_CONN} -se "SHOW SLAVE STATUS\G")
    log "Slave Status: ${RESULTS}"
-
    # A parting tip: Sometimes errors occur in replication. 
    # For example, if you accidentally change a row of data on your slave. 
    # If this happens, fix the data, then run:
-
    #STOP SLAVE;SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1;START SLAVE;
-
 fi    		# end if $LOGSYNC ...
-
  
 # This section has been commented to enable Staging Target run 
 # Anything with two ## are lines of code

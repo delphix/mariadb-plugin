@@ -1,7 +1,6 @@
 #
 # Copyright (c) 2020 by Delphix. All rights reserved.
 #
-
 #######################################################################################################################
 # This module contains all functions invoked by the main plugin() module.
 # All virtual operations are moved to Python already.
@@ -38,9 +37,7 @@ from generated.definitions import (
     SourceConfigDefinition,
     SnapshotDefinition,
 )
-
 logger = logging.getLogger(__name__)
-
 ##################################################
 # Manage mount specification options for linked objects
 # Format: Python
@@ -58,14 +55,12 @@ def linked_mount_specification(staged_source, repository):
         result = libs.run_bash(
             staged_source.staged_connection, steal_mount, variables=None, check=True)
         output = result.stdout.strip()
-
         if output == "1":
             force_umount = "sudo umount -lf %s" % (
                 staged_source.parameters.mount_path)
             result = libs.run_bash(
                 staged_source.staged_connection, steal_mount, None)
             output = result.stdout.strip()
-
         mount_path = staged_source.parameters.mount_path
         logger.debug("Mount Path:"+mount_path)
         environment = staged_source.staged_connection.environment
@@ -74,7 +69,6 @@ def linked_mount_specification(staged_source, repository):
         logger.debug("ERROR: Error creating NFS Mount"+err.message)
         raise
     return MountSpecification(mounts)
-
 ##################################################
 # Manage mount specification options for virtual objects
 # Format: Python
@@ -93,14 +87,12 @@ def virtual_mount_specification(virtual_source, repository):
         result = libs.run_bash(
             virtual_source.connection, steal_mount, variables=None, check=True)
         output = result.stdout.strip()
-
         if output == "1":
             force_umount = "sudo umount -lf %s" % (
                 virtual_source.parameters.m_path)
             result = libs.run_bash(
                 virtual_source.connection, steal_mount, None)
             output = result.stdout.strip()
-
         mount_path = virtual_source.parameters.m_path
         logger.debug("Mount Path:"+mount_path)
         environment = virtual_source.connection.environment
@@ -109,7 +101,6 @@ def virtual_mount_specification(virtual_source, repository):
         logger.debug("ERROR: Error creating NFS Mount"+err.message)
         raise
     return MountSpecification(mounts)
-
 ##################################################
 # Find Repository Information on Host
 # Format: Python
@@ -164,8 +155,6 @@ def find_mysql_binaries(connection):
     except Exception as err:
         raise
     return repositories
-
-
 ##################################################
 # Function to start Staging DB
 # Format: Hybrid ( Python calls Shell Script )
@@ -195,7 +184,8 @@ def start_staging(staged_source, repository, source_config):
             "STAGINGSERVERID": staged_source.parameters.server_id,
             "STAGINGPORT": staged_source.parameters.staging_port,
             "STAGINGCONN": stagingConn,
-            "STAGINGPASS": staged_source.parameters.staging_pass,
+            #            "STAGINGPASS": staged_source.parameters.staging_pass,
+            "SOURCEPASS": staged_source.parameters.source_pass,
             "LOGSYNC": log_sync,
             "STAGINGDATADIR": mount_path
         }
@@ -252,7 +242,6 @@ def start_staging(staged_source, repository, source_config):
             )
         else:
             logger.debug("Start Staging - Successful")
-
 ##################################################
 # Function to Stop Staging DB
 # Format: Hybrid ( Python calls Shell Script )
@@ -273,7 +262,8 @@ def stop_staging(staged_source, repository, source_config):
             "MYSQLD": repository.install_path,
             "STAGINGPORT": staged_source.parameters.staging_port,
             "STAGINGCONN": stagingConn,
-            "STAGINGPASS": staged_source.parameters.staging_pass
+            #            "STAGINGPASS": staged_source.parameters.staging_pass,
+            "SOURCEPASS": staged_source.parameters.source_pass
         }
         stop_staging_script = pkgutil.get_data('resources', 'stopStagedDB.sh')
         result = libs.run_bash(staged_source.staged_connection,
@@ -348,7 +338,6 @@ def stop_staging(staged_source, repository, source_config):
         else:
             logger.debug("Stop Staging - Successful: "+output)
         # TODO: Integration
-
 ##################################################
 # Function to perform pre-snapshot actions
 # Format: Hybrid ( Python calls Shell Script )
@@ -359,31 +348,26 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
     logger.debug("plugin_operations.linked_pre_snapshot > Start ")
     dSourceType = staged_source.parameters.d_source_type
     staging_ip = "localhost"
-
     # Check if performing re-sync
     if int(snapshot_parameters.resync) == 1:
         # Setting defaults
         logsync = "true"
         resync_staging_user = "root"
-
         # Create & Copy Backup file to staging host
         logger.debug(
             "Resyunc found > Performing Resync > Starting with Backup")
         binary_path = staged_source.staged_connection.environment.host.binary_path
         library_script = pkgutil.get_data('resources', 'library.sh')
         mount_path = staged_source.parameters.mount_path
-
         # Buiding Connection Strings for Hybrid Code
         sourceConn = build_lua_connect_string(
             staged_source.parameters.source_user, staged_source.parameters.sourceip)
         stagingConn = build_lua_connect_string(resync_staging_user, staging_ip)
-
         logger.debug("source_conection > "+sourceConn)
         logger.debug("staging_conection > "+stagingConn)
         logger.debug(source_config.base_dir)
         # This condition will help taking care of snapshot wit parameters
         # in case we need to resync the dsource from a new backup
-
         if linked_status(staged_source, repository, source_config) == Status.ACTIVE:
             logger.debug("Check if db exists")
             db_exists = "mysql %s%s --protocol=TCP --port=%s -se \"SHOW DATABASES like '%s'\"" % (
@@ -392,7 +376,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 "found an existing database with the name : {}".format(source_config.db_name))
             result = libs.run_bash(
                 staged_source.staged_connection, db_exists, variables=None, check=False)
-
             logger.debug("stop MariaDB process running on this port")
             kill_mysql_procs = "mysqladmin %s'%s' --protocol=TCP --port=%s shutdown --shutdown-timeout=20" % (
                 stagingConn, staged_source.parameters.staging_pass, staged_source.parameters.staging_port)
@@ -414,7 +397,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
             else:
                 logger.debug(
                     "Stop mysql process this port - Successful: "+output)
-
             logger.debug("system clean up")
             fs_clean = "sudo rm -rf %s/*" % (
                 mount_path)
@@ -424,7 +406,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 staged_source.staged_connection, fs_clean, variables=None, check=False)
             output = result.stdout.strip()
             logger.debug(output)
-
             logger.debug("results after clean up")
             list_fs = "ls -ltr %s/*/*" % (mount_path)
             logger.debug(
@@ -433,7 +414,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 staged_source.staged_connection, list_fs, variables=None, check=False)
             output = result.stdout.strip()
             logger.debug(output)
-
         if dSourceType == "Replication":
             logger.debug(
                 "Inside linked_pre_snapshot() > resync () > dSourceType is Replication")
@@ -460,6 +440,10 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 "STAGINGDATADIR": mount_path,
                 "STAGINGHOSTIP": staging_ip
             }
+            logger.debug("STAGINGPASS IS : " +
+                         staged_source.parameters.staging_pass)
+            logger.debug("REPLICATION_PASS IS : " +
+                         staged_source.parameters.replication_pass)
             logger.debug("Taking or Using existing : Source BackUp")
             backup_script = pkgutil.get_data('resources', 'restore.sh')
             result = libs.run_bash(
@@ -576,7 +560,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 )
             else:
                 logger.debug("Pre-Snapshot/Restore_DB successful "+output)
-
     # Simple Tablespace Option is hidden from the plugin.
     # This section will not get triggered until the option gets added back in schema.json
     # if dSourceType == "Simple (Tablespace Backup)":
@@ -624,7 +607,6 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
     # Stopping DB prior to snapshot
     stop_staging(staged_source, repository, source_config)
     logger.debug(" linked_pre_snapshot > End ")
-
 ##################################################
 # Function perform post-snapshot tasks
 # Format: Python
@@ -641,7 +623,6 @@ def linked_post_snapshot(staged_source, repository, source_config, snapshot_para
         logger.debug("dSourceType is Manual Backup Ingestion")
     else:
         logger.debug("dSourceType is Simple Tablespace Copy")
-
     start_staging(staged_source, repository, source_config)
     logger.debug(snapshot_parameters)
     mount_path = staged_source.parameters.mount_path
@@ -656,7 +637,6 @@ def linked_post_snapshot(staged_source, repository, source_config, snapshot_para
     logger.debug(snapshot)
     logger.debug("linked_post_snapshot - End ")
     return snapshot
-
 ##################################################
 # Function to check status of Staging DB
 # Format: Hybrid ( Python calls Shell Script )
@@ -692,7 +672,6 @@ def linked_status(staged_source, repository, source_config):
         return Status.ACTIVE
     else:
         return Status.INACTIVE
-
 ##################################################
 # Function to Configure VDB
 # Format: Hybrid ( Python calls Shell Script )
@@ -706,7 +685,6 @@ def configure(virtual_source, snapshot, repository):
     mount_path = virtual_source.mounts[0].mount_path
     vdbConn = build_lua_connect_string(
         virtual_source.parameters.vdb_user, virtual_source.parameters.vdb_host)
-
     logger.debug("Mount Path:"+mount_path)
     logger.debug("Snapshot Settings:")
     logger.debug(snapshot)
@@ -731,7 +709,6 @@ def configure(virtual_source, snapshot, repository):
             logger.debug("config_params:"+config_params)
     logger.debug("config_params:"+config_params)
     ###################################################################
-
     environment_vars = {
         "DLPX_LIBRARY_SOURCE": library_script,
         "DLPX_DATA_DIRECTORY": mount_path,
@@ -771,8 +748,6 @@ def configure(virtual_source, snapshot, repository):
         port=virtual_source.parameters.port,
         data_dir=mount_path
     )
-
-
 ##################################################
 # Function to stop a MariaDB
 # Format: Python
@@ -814,7 +789,6 @@ def stop_mysql(port, connection, baseDir, user, pwd, host):
             kill_process(connection, port)
     else:
         logger.debug(" MariaDB database is already .")
-
 ##################################################
 # Function to Kill a Process
 # Format: Python
@@ -845,7 +819,6 @@ def kill_process(connection, port):
         logger.debug(
             "There was an error while trying to kill the MariaDB Process at {}".format(port))
         raise err
-
 ###################################################################
 # Function to get the current status MariaDB instance given the port#
 # Format: Python
@@ -876,7 +849,6 @@ def get_port_status(port, connection):
         result_mnt = libs.run_bash(
             connection, steal_mount, variables=None, check=True)
         output_mnt = result_mnt.stdout.strip()
-
         port_status_cmd = "ps -ef | grep -E \"[m]ysqld .*-p.*" + \
             myport+"\" | grep -v grep"
         result = libs.run_bash(connection, port_status_cmd,
@@ -899,7 +871,6 @@ def get_port_status(port, connection):
             logger.debug("Port Check Failed for second cmd: "+err.message)
     logger.debug("Port Status Response >")
     logger.debug(output)
-
     if output == "":
         logger.debug("MariaDB is NOT RUNNING at Port:"+myport)
     else:
@@ -913,7 +884,6 @@ def get_port_status(port, connection):
         data_dir_list = data_dir_attr.split("=")
         logger.debug("process_id: "+process_id+" bin_dir: " +
                      bin_dir+" data_dir_attr: "+data_dir_attr)
-
         if len(data_dir_list) > 1:
             logger.debug("data_dir_list length is greater than 1")
             data_dir = data_dir_list[1]
@@ -923,7 +893,6 @@ def get_port_status(port, connection):
                 myport, process_id))
             status = Status.ACTIVE
     return status
-
 ##################################################
 # Function to start MariaDB
 # Format: Python
@@ -963,12 +932,12 @@ def start_mysql(installPath, baseDir, mountPath, port, serverId, connection):
             logger.debug("There was an issue starting the DB")
     else:
         logger.debug(" DB is already Running.")
-
-
 ##################################################
 # Function to start MariaDB Slave Replication
 # Format: Python
 ##################################################
+
+
 def start_slave(connection, installPath, port, connString, username, pwd, hostIp):
     start_slave_cmd = ""
     environment_vars = {
@@ -991,7 +960,6 @@ def start_slave(connection, installPath, port, connString, username, pwd, hostIp
         except Exception as err:
             logger.debug("Starting Slave Failed: "+err.message)
             raise err
-
 ##################################################
 # Function to stop MariaDB Slave Replication
 # Format: Python
@@ -1025,7 +993,6 @@ def stop_slave(connection, installPath, port, connString, username, pwd, hostIp)
         except Exception as err:
             logger.debug("Stop Replication Failed Due To: "+err.message)
             logger.debug("Ignoring and continuing")
-
 ##################################################
 # Function to build LUA code connection string
 # Format: Python
@@ -1048,7 +1015,6 @@ def get_connection_cmd(installPath, port, connString, username, pwd, hostIp):
             installPath, port, connString, username, pwd, hostIp)
         logger.debug("connaction_cmd >"+connection_cmd)
     return connection_cmd
-
 ##################################################
 # Function to get the MariaDB Start Command
 # Format: Python
@@ -1066,7 +1032,6 @@ def get_start_cmd(installPath, baseDir, mountPath, port, serverId):
         startup_cmd = CommandFactory.start_mysql(
             installPath, baseDir, mountPath, port, serverId)
     return startup_cmd
-
 ##################################################
 # Function to run bash command on target
 # Format: Python
@@ -1076,11 +1041,11 @@ def get_start_cmd(installPath, baseDir, mountPath, port, serverId):
 def runbash(connection, command, environmentVars):
     logger.debug("operatins.runbash() >>")
     return libs.run_bash(connection, command, variables=environmentVars, check=True)
-
-
 ########################################################
 # DO NOT USE
 ########################################################
+
+
 def repository_discovery(source_connection):
     # This is an object generated from the repositoryDefinition schema.
     # In order to use it locally you must run the 'build -g' command provided
