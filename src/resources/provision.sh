@@ -88,10 +88,10 @@ log "ServerId: ${SERVERID}"
 log "Source --basedir=${CONFIG_BASEDIR}"
 # Create Initial Database ...
 log "MySQL Version: ${MYSQLVER}"
-if [[ "${MYSQLVER:0:3}" == "5.6" ]]
-then
-   die "MySQL ${MYSQLVER} is not supported."
-fi
+#if [[ "${MYSQLVER:0:3}" == "5.6" ]]
+#then
+#   die "MySQL ${MYSQLVER} is not supported."
+#fi
 
 # Create my.cnf file
 #NEW_MY_CNF="my.cnf"

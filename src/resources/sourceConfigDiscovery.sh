@@ -52,7 +52,7 @@ for instance in $instances; do
    port=`echo "$str" | awk 'BEGIN {RS=" "}; /--port/' | cut -d"=" -f2`
    log "--datadir=${datadir}"
    log "--port=${port}"
-   version="5.#"
+   version="10.#"
 
    dbName="${instance##*/}"
    prettyName="MariaDB - $port $datadir"
