@@ -41,7 +41,7 @@ def process_exit_codes(exit_code,operation,std_err=None):
     err_out=const.ERR_GENERAL_OUT
     if std_err:
         err_out=std_err
-    if exit_code == 3:  # Unable to start MySQL
+    if exit_code == 3:  # Unable to start MariaDB
         err_msg=const.ERR_START_MSG
         err_action=const.ERR_START_ACTION
     elif exit_code == 4:  # Could not find my.cnf

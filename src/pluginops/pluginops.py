@@ -672,6 +672,7 @@ def linked_status(staged_source, repository, source_config):
         return Status.ACTIVE
     else:
         return Status.INACTIVE
+
 ##################################################
 # Function to Configure VDB
 # Format: Hybrid ( Python calls Shell Script )
@@ -684,7 +685,9 @@ def configure(virtual_source, snapshot, repository):
     library_script = pkgutil.get_data('resources', 'library.sh')
     mount_path = virtual_source.mounts[0].mount_path
     vdbConn = build_lua_connect_string(
-        virtual_source.parameters.vdb_user, virtual_source.parameters.vdb_host)
+        virtual_source.parameters.vdb_user,
+        "localhost"
+    )
     logger.debug("Mount Path:"+mount_path)
     logger.debug("Snapshot Settings:")
     logger.debug(snapshot)
@@ -709,6 +712,7 @@ def configure(virtual_source, snapshot, repository):
             logger.debug("config_params:"+config_params)
     logger.debug("config_params:"+config_params)
     ###################################################################
+
     environment_vars = {
         "DLPX_LIBRARY_SOURCE": library_script,
         "DLPX_DATA_DIRECTORY": mount_path,
@@ -721,6 +725,7 @@ def configure(virtual_source, snapshot, repository):
         "PORT": virtual_source.parameters.port,
         "SERVERID": virtual_source.parameters.server_id,
         "MYCONFIG": config_params,
+        # "STAGED_HOST":snapshot.snap_host,
         "STAGED_PORT": snapshot.snap_port,
         "STAGED_DATADIR": snapshot.snap_data_dir,
         "CONFIG_BASEDIR": snapshot.snap_base_dir,
@@ -731,7 +736,8 @@ def configure(virtual_source, snapshot, repository):
     result = libs.run_bash(virtual_source.connection,
                            configure_script, environment_vars, check=False)
     logger.debug(result)
-    output = result.stdout.strip()
+    output = (result.stdout.strip()).split("\n")
+    output = output[2]
     std_err = result.stderr.strip()
     exit_code = result.exit_code
     if exit_code == 0:
@@ -748,6 +754,8 @@ def configure(virtual_source, snapshot, repository):
         port=virtual_source.parameters.port,
         data_dir=mount_path
     )
+
+
 ##################################################
 # Function to stop a MariaDB
 # Format: Python

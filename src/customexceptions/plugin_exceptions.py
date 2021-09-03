@@ -13,9 +13,9 @@ from customexceptions.base_exceptions import PluginException
 
 class RepositoryDiscoveryError(PluginException):
     def __init__(self, message=""):
-        message = "Finding MySQL Installations on the server, " + message
+        message = "Finding  MariaDB Installations on the server, " + message
         super(RepositoryDiscoveryError, self).__init__(message,
-                                                       "Check the MySQL installation. If installed at a non-standard location, please set MySQL base directory into environment variables",
+                                                       "Check the MariaDB installation. If installed at a non-standard location, please set MariaDB base directory into environment variables",
                                                        "Failed to search repository information")
 
 
@@ -24,8 +24,9 @@ class SourceConfigDiscoveryError(PluginException):
     def __init__(self, message=""):
         message = "Failed to find source config, " + message
         super(SourceConfigDiscoveryError, self).__init__(message,
-                                                         "Stop the MySQL service if it is running",
+                                                         "Stop the MariaDB service if it is running",
                                                          "Not able to find source configuration")
+
 
 class MountPathError(PluginException):
     def __init__(self, message=""):
@@ -43,19 +44,23 @@ class UnmountFileSystemError(PluginException):
                                                      "Please check the logs for more details")
 
 # This exception is used for all Linking Failures
+
+
 class LinkingException(PluginException):
     def __init__(self, message=""):
         message = "Failed to link source, " + message
         super(LinkingException, self).__init__(message,
-                                                         "Please review the error log and re-try",
-                                                         "Unable to Link dSource")
+                                               "Please review the error log and re-try",
+                                               "Unable to Link dSource")
 # This exception is used for all VDB Failures
+
+
 class VirtualException(PluginException):
     def __init__(self, message=""):
         message = "Failed to link source, " + message
         super(VirtualException, self).__init__(message,
-                                                         "Please review the error log and re-try",
-                                                         "Unable to Provision VDB")
+                                               "Please review the error log and re-try",
+                                               "Unable to Provision VDB")
 
 
 ERR_RESPONSE_DATA = {

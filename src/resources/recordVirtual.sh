@@ -35,7 +35,7 @@ repo=$($DLPX_BIN_JQ ".snapBaseDir = \"$TMP2\" " <<< "$repo")
 repo=$($DLPX_BIN_JQ ".snapPass = \"$MYROOTPASS\" " <<< "$repo")
 repo=$($DLPX_BIN_JQ ".snapBackup = \"\" " <<< "$repo")
 
-echo "$repo" > "$DLPX_OUTPUT_FILE"
+#echo "$repo" > "$DLPX_OUTPUT_FILE"
 #log "Output: $repo"
 
 repo1='{}'

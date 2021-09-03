@@ -731,7 +731,7 @@ def configure(virtual_source, snapshot, repository):
 
 
 def stop_mysql(port, connection, baseDir, user, pwd, host):
-    # This function will stop a running MySQL Database.
+    # This function will stop a running MariaDB Database.
     logger.debug("Commence > stop_mysql()")
     port_stat = get_port_status(port, connection)
     logger.debug("Port Status > "+port_stat.name)

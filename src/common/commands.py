@@ -4,7 +4,7 @@
 
 #######################################################################################################################
 """
-CommandFactory class contains all commands required to perform MySQL and OS related operations
+CommandFactory class contains all commands required to perform MariaDB and OS related operations
 These are a list of commands which are being used in this project. Have segregated both types of commands into two
 classes 
     DatabaseCommand

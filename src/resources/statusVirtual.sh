@@ -52,7 +52,7 @@ then
 else
    ACTIVE="INACTIVE"  
 fi
-printf "\"${ACTIVE}\"" > "$DLPX_OUTPUT_FILE"
+#printf "\"${ACTIVE}\"" > "$DLPX_OUTPUT_FILE"
 log "Output: ${ACTIVE}" 
 
 #log "Environment: "

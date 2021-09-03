@@ -87,10 +87,10 @@ log "ServerId: ${SERVERID}"
 ## On Target Server ...
 log "Source --basedir=${CONFIG_BASEDIR}"
 # Create Initial Database ...
-log "MariaDB Version: ${MYSQLVER}"
+log "MySQL Version: ${MYSQLVER}"
 if [[ "${MYSQLVER:0:3}" == "5.6" ]]
 then
-   die "MariaDB ${MYSQLVER} is not supported."
+   die "MySQL ${MYSQLVER} is not supported."
 fi
 
 # Create my.cnf file
@@ -121,7 +121,7 @@ CMD=`ls -llR ${NEW_MOUNT_DIR}`
 log "${NEW_MOUNT_DIR}"
 log "${CMD}"
 
-# Change MariaDB Database Tables ...
+# Change MySQL Database Tables ...
 log "Checking for Customer Security ..."
 if [[ -f "${DLPX_TOOLKIT}/mysql_db_tables.zip" ]]
 then
@@ -207,7 +207,8 @@ fi
 #
 # Output ...
 #
-prettyName="MariaDB-VDB-${TARGET_PORT}"
+#prettyName="MARIA-VDB-${TARGET_PORT}"
+prettyName="MariaVDB - ${TARGET_PORT} - ${NEW_DATA_DIR}"
 
 outputJSON='{}'
 outputJSON=$($DLPX_BIN_JQ ".dataDir = $(jqQuote "$DLPX_DATA_DIRECTORY")" <<< "$outputJSON")
@@ -215,14 +216,15 @@ outputJSON=$($DLPX_BIN_JQ ".port = $(jqQuote "$PORT")"  <<< "$outputJSON")
 outputJSON=$($DLPX_BIN_JQ ".baseDir = $(jqQuote "$CONFIG_BASEDIR")" <<< "$outputJSON")
 outputJSON=$($DLPX_BIN_JQ ".dbName = $(jqQuote "$prettyName")" <<< "$outputJSON")
 
-printf "$outputJSON" > "$DLPX_OUTPUT_FILE"
+#printf "$outputJSON" > "$DLPX_OUTPUT_FILE"
+
 log "Output: $outputJSON"
 echo "${prettyName}"
-log "Environment: "
-export DLPX_LIBRARY_SOURCE=""
-export REPLICATION_PASS=""
-export SNAPSHOT_METADATA=""
-export STAGINGPASS=""
-env | sort  >>$DEBUG_LOG
+#log "Environment: "
+#export DLPX_LIBRARY_SOURCE=""
+#export REPLICATION_PASS=""
+#export SNAPSHOT_METADATA=""
+#export STAGINGPASS=""
+#env | sort  >>$DEBUG_LOG
 log "End"
 exit 0

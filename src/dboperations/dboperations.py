@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def stop_mysql(port, connection, baseDir, vdbConn, pwd):
-    # This function will stop a running MySQL Database.
+    # This function will stop a running MariaDB Database.
     logger.debug("Commence > stop_mysql()")
     port_stat = get_port_status(port, connection)
     logger.debug("Port Status > "+port_stat.name)
@@ -81,10 +81,10 @@ def kill_process(connection, port):
                     raise Exception(_bashresult.stderr.strip())
     except Exception as err:
         logger.debug(
-            "There was an error while trying to kill the MySQL Process at {}".format(port))
+            "There was an error while trying to kill the MariaDB Process at {}".format(port))
 
 
-# Get the current status MySQL instance given the port#
+# Get the current status MariaDB instance given the port#
 def get_port_status(port, connection):
     myport = port
     status = Status.INACTIVE
@@ -110,7 +110,7 @@ def get_port_status(port, connection):
     logger.debug(output)
 
     if output == "":
-        logger.debug("MySQL DB is NOT RUNNING at Port:"+myport)
+        logger.debug("MariaDB DB is NOT RUNNING at Port:"+myport)
     else:
         logger.debug("A process is running at Port.")
         output = re.sub("\s\s+", " ", output)
@@ -127,21 +127,21 @@ def get_port_status(port, connection):
             data_dir = data_dir_list[1]
             logger.debug("data_dir: "+data_dir)
         if (process_id != "" and bin_dir != "" and data_dir != ""):
-            logger.debug("MySQL DB is running at PORT %s with PROCESS ID: %s" % (
+            logger.debug("MariaDB DB is running at PORT %s with PROCESS ID: %s" % (
                 myport, process_id))
             status = Status.ACTIVE
     return status
 
 
 def start_mysql(installPath, baseDir, mountPath, port, serverId, connection):
-    # This function will stop a running MySQL Database.
+    # This function will stop a running MariaDB Database.
     logger.debug("Commence > start_mysql()")
     port_stat = get_port_status(port, connection)
     logger.debug("Port Status > "+port_stat.name)
     environment_vars = {
     }
     if(port_stat == Status.INACTIVE):
-        logger.debug("DB is not running. Starting the MySQL DB")
+        logger.debug("DB is not running. Starting the MariaDB DB")
         start_cmd = get_start_cmd(
             installPath, baseDir, mountPath, port, serverId)
         logger.debug("Startup Command: {}".format(start_cmd))
@@ -170,7 +170,7 @@ def get_start_cmd(installPath, baseDir, mountPath, port, serverId):
         logger.debug(
             "One of the required parameters are empty. Cannot continue.")
         raise Exception(
-            "One of the required params for MySQL Connection is empty")
+            "One of the required params for MariaDB Connection is empty")
     else:
         startup_cmd = "%s/mysqld --defaults-file=%s/my.cnf --basedir=%s --datadir=%s/data \
             --pid-file=%s/clone.pid --port=%s --server-id=%s --socket=%s/mysql.sock \
@@ -186,7 +186,7 @@ def start_slave(connection, installPath, port, connString, username, pwd, hostIp
         logger.debug(
             "One of the required parameters are empty. Cannot continue.")
         raise Exception(
-            "One of the required params for MySQL Connection is empty")
+            "One of the required params for MariaDB Connection is empty")
     else:
         start_slave_cmd = CommandFactory.start_replication(
             connection, installPath, port, connString, username, pwd, hostIp)
@@ -210,7 +210,7 @@ def stop_slave(connection, installPath, port, connString, username, pwd, hostIp)
         logger.debug(
             "One of the required parameters are empty. Cannot continue.")
         raise Exception(
-            "One of the required params for MySQL Connection is empty")
+            "One of the required params for MariaDB Connection is empty")
     else:
         stop_slave_cmd = CommandFactory.stop_replication(
             connection, installPath, port, connString, username, pwd, hostIp)
@@ -243,7 +243,7 @@ def get_connection_cmd(installPath, port, connString, username, pwd, hostIp):
         logger.debug(
             "One of the required parameters are empty. Cannot continue.")
         raise ValueError(
-            "One of the required params for MySQL Connection is empty")
+            "One of the required params for MariaDB Connection is empty")
     else:
         connection_cmd = CommandFactory.connect_to_mysql(
             installPath, port, connString, username, pwd, hostIp)
@@ -257,7 +257,7 @@ def get_start_cmd(installPath, baseDir, mountPath, port, serverId):
         logger.debug(
             "One of the required parameters are empty. Cannot continue.")
         raise ValueError(
-            "One of the required params for MySQL Connection is empty")
+            "One of the required params for MariaDB Connection is empty")
     else:
         startup_cmd = CommandFactory.start_mysql(
             installPath, baseDir, mountPath, port, serverId)
@@ -291,7 +291,7 @@ def find_mysql_binaries(connection):
             logger.debug("find_mysql_binaries > exit code> "+str(_bashErrCode))
             raise RepositoryDiscoveryError(_bashErrMsg)
         elif (_repoList == "" or _repoList is None):
-            logger.debug("find_mysql_binaries > No MySQL repositories found")
+            logger.debug("find_mysql_binaries > No MariaDB repositories found")
         else:
             for repoPath in _repoList.splitlines():
                 logger.debug("Parsing repository at "+repoPath)
@@ -304,7 +304,7 @@ def find_mysql_binaries(connection):
                 version = versionArr[3]
                 if (version != "" and baseName == "mysqld"):
                     prettyName = versionStr[versionStr.index(
-                        "(MySQL"):len(versionStr)]
+                        "(MariaDB"):len(versionStr)]
                     prettyName = prettyName+" {}".format(version)
                     repository = RepositoryDefinition(
                         name=prettyName, install_path=dirName, version=version)

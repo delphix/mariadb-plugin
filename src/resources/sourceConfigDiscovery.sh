@@ -67,7 +67,7 @@ done
 IFS="$OLD_IFS"
 
 log "Output: ${sourceConfigList}"
-echo "$sourceConfigList" > "$DLPX_OUTPUT_FILE"
+#echo "$sourceConfigList" > "$DLPX_OUTPUT_FILE"
 
 #log "Environment: "
 #export DLPX_LIBRARY_SOURCE=""
