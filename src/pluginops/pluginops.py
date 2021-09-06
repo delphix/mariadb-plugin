@@ -440,10 +440,7 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 "STAGINGDATADIR": mount_path,
                 "STAGINGHOSTIP": staging_ip
             }
-            logger.debug("STAGINGPASS IS : " +
-                         staged_source.parameters.staging_pass)
-            logger.debug("REPLICATION_PASS IS : " +
-                         staged_source.parameters.replication_pass)
+
             logger.debug("Taking or Using existing : Source BackUp")
             backup_script = pkgutil.get_data('resources', 'restore.sh')
             result = libs.run_bash(
@@ -495,7 +492,8 @@ def linked_pre_snapshot(staged_source, repository, source_config, snapshot_param
                 "STAGINGPASS": staged_source.parameters.staging_pass,
                 "STAGINGDATADIR": mount_path,
                 "SOURCEBASEDIR": source_config.base_dir,
-                "STAGINGHOSTIP": staging_ip
+                "STAGINGHOSTIP": staging_ip,
+                "SOURCEIP": staged_source.parameters.sourceip
             }
             logger.debug("Initializing Seed DB")
             restore_script = pkgutil.get_data(

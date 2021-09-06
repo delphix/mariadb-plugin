@@ -21,7 +21,7 @@
 #
 # Toolkit Specific ...
 # 
-DLPX_TOOLKIT_NAME="mysql" 
+DLPX_TOOLKIT_NAME="MariaDB" 
 #${DLPX_BIN}="/var/opt/delphix/toolkit/Delphix_COMMON_564d1a3e_4dee_b451_14d5_9bfc5ccf1dc5_delphix_host/scripts/bin"
 dlpx_db_exec_script="$DLPX_BIN/dlpx_db_exec"
 DLPX_TOOLKIT=$( dirname "${DLPX_BIN}" )

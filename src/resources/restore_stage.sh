@@ -48,12 +48,15 @@ TARGET_PORT=${STAGINGPORT}
 log "Source Port: ${SOURCE_PORT}"
 log "Staging Port: ${TARGET_PORT}"
 
+BKP_LOC=${STAGINGDATADIR}/.tmp
+BKP_DT=`date '+%Y%m%d'`
+
 #
 # Backup File Location ...
 #
 if [[ "${BACKUP_PATH}" == "" ]]
 then
-   BKUP_FILE="/tmp/dump_${SOURCE_PORT}.sql"
+   BKUP_FILE="${BKP_LOC}/dump_${SOURCEIP}_${SOURCE_PORT}_${BKP_DT}.sql"
 else 
    BKUP_FILE="${BACKUP_PATH}"
 fi 
@@ -548,6 +551,8 @@ log "Return Status for ingest backup: ${return_code}"
 log "Return message for ingest backup:${return_msg}"
 if [ $return_code != 0 ]; then
   terminate "${return_msg}" 6
+else
+  rm -f ${BKP_LOC}/*
 fi
 
 

@@ -51,10 +51,14 @@ then
    log "Source Port: ${SOURCEPORT}"
    log "Staging Port: ${STAGINGPORT}"
 
+   BKP_LOC=${STAGINGDATADIR}/.tmp
+   BKP_DT=`date '+%Y%m%d'`
+   [ ! -d "$BKP_LOC" ] && mkdir ${STAGINGDATADIR}/.tmp 
+   
    #
    # Backup File Location ...
    #
-   BKUP_FILE="/tmp/dump_${SOURCEPORT}.sql"
+   BKUP_FILE="${BKP_LOC}/dump_${SOURCEIP}_${SOURCEPORT}_${BKP_DT}.sql"
    if [[ -f "${BKUP_FILE}" ]]
    then
 #      mv ${BKUP_FILE} ${BKUP_FILE}_${DT}
@@ -104,7 +108,7 @@ then
       SQL="SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN"
       SQL="${SQL} ('mysql','information_schema','performance_schema')"
  
-      DBLISTFILE=/tmp/DatabasesToDump_$$.txt
+      DBLISTFILE=${SOURCEIP}_DatabasesToDump_$$.txt
       ${INSTALL_BIN}/mysql ${SOURCE_CONN} -ANe"${SQL}" > ${DBLISTFILE}
  
       DBLIST=""
