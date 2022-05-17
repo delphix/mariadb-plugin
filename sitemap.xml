@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Pre-Requisites/General/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Pre-Requisites/Replication_Mode/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Pre-Requisites/Manual_Ingestion_Mode/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/PluginInstallation/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Discovery/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Linking/Replication_Mode/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Linking/Manual_Ingestion_Mode/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Provisioning/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/Release_Notes/MariaDB_1.0.0/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/References/ExitCodes/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://gitlab.delphix.com/mouhssine.saidi/mariadb_linux/References/Troubleshooting/index.html</loc>
-     <lastmod>2021-08-13</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2022-05-17</lastmod>
+         <changefreq>daily</changefreq>
     </url>
 </urlset>
