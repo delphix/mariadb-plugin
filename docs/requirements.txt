@@ -20,7 +20,7 @@ packaging==21.0
 pipenv==2021.5.29
 platformdirs==2.2.0
 Pygments==2.9.0
-pymdown-extensions==8.2
+pymdown-extensions==10.0
 pyparsing==2.4.7
 python-dateutil==2.8.2
 PyYAML==5.4.1
