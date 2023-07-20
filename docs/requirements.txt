@@ -19,7 +19,7 @@ mkdocs-material-extensions==1.0.1
 packaging==21.0
 pipenv==2021.5.29
 platformdirs==2.2.0
-Pygments==2.9.0
+Pygments==2.15.0
 pymdown-extensions==8.2
 pyparsing==2.4.7
 python-dateutil==2.8.2
